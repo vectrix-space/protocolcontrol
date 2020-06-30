@@ -1,0 +1,157 @@
+buildscript {
+  repositories {
+    maven {
+      name = "forge"
+      url = "http://files.minecraftforge.net/maven"
+    }
+  }
+
+  dependencies {
+    classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+  }
+}
+
+plugins {
+  id "net.minecrell.licenser" version "0.4"
+  id "com.github.johnrengelman.shadow" version "5.1.0"
+  id "org.spongepowered.plugin" version "0.9.0"
+  id "net.minecrell.vanillagradle.server" version "2.2-6"
+  id "java"
+  id "maven-publish"
+}
+
+sponge.plugin.id = pluginId
+
+group = pluginGroup
+version = pluginVersion
+
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+
+repositories {
+  maven {
+    url "https://oss.sonatype.org/content/repositories/snapshots"
+  }
+}
+
+license {
+  header = file("HEADER.txt")
+  newLine = false
+  ext {
+    name = "ProtocolControl"
+    organization = "IchorPowered"
+    url = "http://ichorpowered.com"
+  }
+
+  include("**/*.java", "**/*.groovy", "**/*.kt")
+}
+
+dependencies {
+  compile 'net.kyori:mu:1.0.0-SNAPSHOT'
+  compile 'net.kyori:violet:1.2.0-SNAPSHOT'
+  compile 'net.kyori:indigo:1.0.0-SNAPSHOT'
+  compile "net.kyori:event-method-asm:3.0.0"
+  compileOnly "org.spongepowered:spongeapi:7.2.0"
+  annotationProcessor "org.spongepowered:spongeapi:7.2.0"
+}
+
+tasks.withType(JavaCompile) {
+  options.compilerArgs += ["-Xlint:all", "-Xlint:-path", "-parameters"]
+  options.deprecation = true
+  options.encoding = "UTF-8"
+}
+
+minecraft {
+  version = "1.12.2"
+  mappings = "snapshot_20180808"
+  makeObfSourceJar = false
+}
+
+jar {
+  manifest.attributes(
+    "Specification-Title": "ProtocolControl",
+    "Specification-Vendor": "IchorPowered",
+    "Specification-Version": 1,
+    "Implementation-Title": project.name,
+    "Implementation-Version": project.version,
+    "FMLAT": "protocolcontrol_at.cfg",
+    "ForceLoadAsMod": true
+  )
+}
+
+javadoc {
+  options.encoding = "UTF-8"
+  options.charSet = "UTF-8"
+  options.links(
+    "http://www.slf4j.org/apidocs/",
+    "https://google.github.io/guava/releases/21.0/api/docs/",
+    "https://google.github.io/guice/api-docs/4.1/javadoc/",
+    "http://asm.ow2.org/asm50/javadoc/user/"
+  )
+
+  // Disable the crazy super-strict doclint tool in Java 8
+  options.addStringOption("Xdoclint:none", "-quiet")
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = "javadoc"
+  from javadoc.destinationDir
+}
+
+shadowJar {
+  classifier = "shaded"
+  dependsOn reobfJar
+
+  dependencies {
+    include(dependency('net.kyori:mu'))
+    include(dependency('net.kyori:violet'))
+    include(dependency('net.kyori:indigo'))
+    include(dependency("net.kyori:event-api"))
+    include(dependency("net.kyori:event-method"))
+    include(dependency("net.kyori:event-method-asm"))
+    include(dependency('net.kyori:examination-api'))
+
+    include(dependency('com.google.inject.extensions:guice-assistedinject'))
+    include(dependency('com.google.inject.extensions:guice-multibindings'))
+  }
+}
+
+artifacts {
+  archives sourceJar
+  archives javadocJar
+  archives shadowJar
+}
+
+publishing {
+  repositories {
+    maven {
+      name = "GitHubPackages"
+      url = "https://maven.pkg.github.com/ichorpowered/protocolcontrol"
+      credentials {
+        username = project.findProperty("gpr.user") as String ?: System.getenv("GITHUB_USERNAME")
+        password = project.findProperty("gpr.key") as String ?: System.getenv("GITHUB_TOKEN")
+      }
+    }
+  }
+  publications {
+    mavenJava(MavenPublication) {
+      pom {
+        name = "protocolcontrol"
+        description = "A minimal packet manipulation library for Sponge."
+
+        licenses {
+          license {
+            name = "MIT"
+            url = "https://opensource.org/licenses/MIT"
+          }
+        }
+
+        scm {
+          connection = "scm:git:git://github.com/ichorpowered/protocolcontrol.git"
+          developerConnection = "scm:git:ssh://github.com/ichorpowered/protocolcontrol.git"
+          url = "https://github.com/ichorpowered/protocolcontrol/"
+        }
+      }
+    }
+  }
+}
