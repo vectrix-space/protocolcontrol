@@ -137,8 +137,8 @@ public final class PacketHandler extends ChannelDuplexHandler {
       try {
         if (message instanceof Packet) {
           final PacketEvent<?> packetEvent = new PacketEvent<>(this.handler.profile(), PacketDirection.INCOMING, (Packet<?>) message);
-
           this.handler.event().fire(packetEvent).get();
+
           if (packetEvent.cancel()) return;
           message = packetEvent.packet();
         }
@@ -168,8 +168,8 @@ public final class PacketHandler extends ChannelDuplexHandler {
       try {
         if (message instanceof Packet) {
           final PacketEvent<?> packetEvent = new PacketEvent<>(this.handler.profile(), PacketDirection.OUTGOING, (Packet<?>) message);
-
           this.handler.event().fire(packetEvent).get();
+
           if (packetEvent.cancel()) return;
           message = packetEvent.packet();
         }
