@@ -32,6 +32,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -67,11 +68,16 @@ public final class ProtocolPlugin {
     this.protocolEvent = childInjector.getInstance(ProtocolEvent.class);
     this.protocolInjector = childInjector.getInstance(ProtocolInjector.class);
 
-    this.protocolEvent.enable();
-    this.protocolInjector.enable();
+    this.protocolInjector.setup();
 
     final ProtocolService protocolService = childInjector.getInstance(ProtocolService.class);
     Sponge.getServiceManager().setProvider(this, ProtocolService.class, protocolService);
+  }
+
+  @Listener(order = Order.FIRST)
+  public void onGameStarting(final GamePostInitializationEvent event) {
+    this.protocolEvent.enable();
+    this.protocolInjector.enable();
 
     this.logger.info("Successfully injected " + this.plugin.getName() + " version " + this.plugin.getVersion().orElse("UNKNOWN"));
   }
@@ -81,6 +87,6 @@ public final class ProtocolPlugin {
     if(this.protocolEvent != null && this.protocolEvent.enabled()) this.protocolEvent.disable();
     if(this.protocolInjector != null && this.protocolInjector.enabled()) this.protocolInjector.disable();
 
-    this.logger.info("Gracefully stopped " + this.plugin.getName());
+    this.logger.info("Stopped " + this.plugin.getName());
   }
 }

@@ -36,7 +36,6 @@ import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
 
-@SuppressWarnings("unchecked")
 @Singleton
 public final class ProtocolInjector {
   public static final String INCOMING_HANDLER = "protocolcontrol_incoming";
@@ -44,6 +43,9 @@ public final class ProtocolInjector {
   private final Game game;
   private final Logger logger;
   private final ChannelInitializer initializer;
+  private NetworkSystem networkSystem;
+  private List<ChannelFuture> endpoints;
+  private boolean setup = false;
   private boolean enabled = false;
 
   @Inject
@@ -55,17 +57,34 @@ public final class ProtocolInjector {
     this.initializer = initializer;
   }
 
-  public void enable() {
-    if(this.enabled) return;
+  @SuppressWarnings({"JavaReflectionMemberAccess", "unchecked"})
+  public void setup() {
+    if(this.setup) return;
 
     try {
       final Field networkField = MinecraftServer.class.getDeclaredField("field_147144_o");
-      final NetworkSystem networkSystem = (NetworkSystem) networkField.get(this.game.getServer());
+      this.networkSystem = (NetworkSystem) networkField.get(this.game.getServer());
 
       final Field endpointsField = networkSystem.getClass().getDeclaredField("field_151274_e");
-      final List<ChannelFuture> channelFutures = (List<ChannelFuture>) endpointsField.get(networkSystem);
+      this.endpoints = (List<ChannelFuture>) endpointsField.get(networkSystem);
 
-      for(final ChannelFuture future : channelFutures) {
+      this.setup = true;
+    } catch(Throwable throwable) {
+      Exceptions.catchingReport(
+        throwable,
+        this.logger,
+        ProtocolInjector.class,
+        "injector_setup",
+        "Encountered a major exception attempting to setup channel injector"
+      );
+    }
+  }
+
+  public void enable() {
+    if(this.enabled || !this.setup) return;
+
+    try {
+      for(final ChannelFuture future : this.endpoints) {
         future.channel().pipeline().addFirst(this.initializer);
       }
 
@@ -82,16 +101,10 @@ public final class ProtocolInjector {
   }
 
   public void disable() {
-    if(!this.enabled) return;
+    if(!this.enabled || !this.setup) return;
 
     try {
-      final Field networkField = MinecraftServer.class.getDeclaredField("field_147144_o");
-      final NetworkSystem networkSystem = (NetworkSystem) networkField.get(this.game.getServer());
-
-      final Field channelField = networkSystem.getClass().getDeclaredField("field_151274_e");
-      final List<ChannelFuture> channelFutures = (List<ChannelFuture>) channelField.get(networkSystem);
-
-      for(final ChannelFuture future : channelFutures) {
+      for(final ChannelFuture future : this.endpoints) {
         future.channel().pipeline().remove(this.initializer);
       }
 
