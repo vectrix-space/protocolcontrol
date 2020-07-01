@@ -24,17 +24,18 @@
  */
 package com.ichorpowered.protocolcontrol.service;
 
+import com.ichorpowered.protocolcontrol.ProtocolChannel;
 import com.ichorpowered.protocolcontrol.ProtocolEvent;
 import com.ichorpowered.protocolcontrol.packet.PacketRemapper;
 
 public interface ProtocolService {
   /**
-   * Returns the {@link PacketRemapper} providing methods to
-   * optionally remap packets from events.
+   * Returns the {@link ProtocolChannel} providing methods to
+   * access channel profiles.
    *
-   * @return the packet remapper
+   * @return the protocol channels
    */
-  PacketRemapper remapper();
+  ProtocolChannel channels();
 
   /**
    * Returns the {@link ProtocolEvent} providing methods to
@@ -43,4 +44,12 @@ public interface ProtocolService {
    * @return the protocol events
    */
   ProtocolEvent events();
+
+  /**
+   * Returns the {@link PacketRemapper} providing methods to
+   * optionally remap packets from events.
+   *
+   * @return the packet remapper
+   */
+  PacketRemapper remapper();
 }

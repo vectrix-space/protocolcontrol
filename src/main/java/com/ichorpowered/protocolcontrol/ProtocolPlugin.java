@@ -49,6 +49,7 @@ public final class ProtocolPlugin {
   private final Injector injector;
   private final PluginContainer plugin;
   private final Logger logger;
+  private ProtocolChannel protocolChannel;
   private ProtocolEvent protocolEvent;
   private ProtocolInjector protocolInjector;
 
@@ -65,6 +66,7 @@ public final class ProtocolPlugin {
   public void onGameInitialization(final GameInitializationEvent event) {
     final Injector childInjector = this.injector.createChildInjector(new ProtocolModule());
 
+    this.protocolChannel = childInjector.getInstance(ProtocolChannel.class);
     this.protocolEvent = childInjector.getInstance(ProtocolEvent.class);
     this.protocolInjector = childInjector.getInstance(ProtocolInjector.class);
 
@@ -76,6 +78,7 @@ public final class ProtocolPlugin {
 
   @Listener(order = Order.FIRST)
   public void onGameStarting(final GamePostInitializationEvent event) {
+    this.protocolChannel.enable();
     this.protocolEvent.enable();
     this.protocolInjector.enable();
 
@@ -84,8 +87,9 @@ public final class ProtocolPlugin {
 
   @Listener(order = Order.LAST)
   public void onGameStopped(final GameStoppingServerEvent event) {
-    if(this.protocolEvent != null && this.protocolEvent.enabled()) this.protocolEvent.disable();
     if(this.protocolInjector != null && this.protocolInjector.enabled()) this.protocolInjector.disable();
+    if(this.protocolEvent != null && this.protocolEvent.enabled()) this.protocolEvent.disable();
+    if(this.protocolChannel != null && this.protocolChannel.enabled()) this.protocolChannel.disable();
 
     this.logger.info("Stopped " + this.plugin.getName());
   }

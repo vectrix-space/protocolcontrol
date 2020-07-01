@@ -24,6 +24,7 @@
  */
 package com.ichorpowered.protocolcontrol.packet;
 
+import com.ichorpowered.protocolcontrol.ProtocolChannel;
 import com.ichorpowered.protocolcontrol.ProtocolInjector;
 import com.ichorpowered.protocolcontrol.channel.ChannelProfile;
 import com.ichorpowered.protocolcontrol.ProtocolEvent;
@@ -43,17 +44,20 @@ import org.slf4j.Logger;
 @ChannelHandler.Sharable
 public final class PacketHandler extends ChannelDuplexHandler {
   private final Logger logger;
-  private final ProtocolEvent event;
+  private final ProtocolChannel channels;
+  private final ProtocolEvent events;
   private final PacketRemapper remapper;
   private final ChannelProfile profile;
   private boolean injected = false;
 
   public PacketHandler(final Logger logger,
-                       final ProtocolEvent event,
+                       final ProtocolChannel channels,
+                       final ProtocolEvent events,
                        final PacketRemapper remapper,
                        final ChannelProfile profile) {
     this.logger = logger;
-    this.event = event;
+    this.channels = channels;
+    this.events = events;
     this.remapper = remapper;
     this.profile = profile;
   }
@@ -63,7 +67,7 @@ public final class PacketHandler extends ChannelDuplexHandler {
   }
 
   public ProtocolEvent event() {
-    return this.event;
+    return this.events;
   }
 
   public ChannelProfile profile() {
@@ -106,8 +110,10 @@ public final class PacketHandler extends ChannelDuplexHandler {
       if(message instanceof SPacketLoginSuccess) {
         final PacketRemapper.Wrapped<SPacketLoginSuccess> wrapped = this.remapper.wrap((SPacketLoginSuccess) message);
         final GameProfile profile = wrapped.get(GameProfile.class, 0);
+        assert profile != null;
 
         this.profile.player(profile.getId());
+        this.channels.set(this.profile.player(), this.profile);
       }
     } catch(Throwable throwable) {
       Exceptions.catchingReport(
@@ -124,7 +130,10 @@ public final class PacketHandler extends ChannelDuplexHandler {
 
   @Override
   public void channelInactive(final ChannelHandlerContext context) throws Exception {
-    if(this.injected) this.profile.active(false);
+    if(this.injected) {
+      this.channels.clear(this.profile.player());
+      this.profile.active(false);
+    }
 
     super.channelInactive(context);
   }

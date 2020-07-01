@@ -26,7 +26,6 @@ package com.ichorpowered.protocolcontrol;
 
 import com.ichorpowered.protocolcontrol.event.PacketEvent;
 import com.ichorpowered.protocolcontrol.packet.PacketHandler;
-import com.ichorpowered.protocolcontrol.packet.PacketRemapper;
 import com.ichorpowered.protocolcontrol.util.Exceptions;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
@@ -46,17 +45,14 @@ import org.slf4j.Logger;
 @Singleton
 public final class ProtocolEvent {
   private final Logger logger;
-  private final PacketRemapper remapper;
   private SimpleEventBus<Object> bus;
   private MethodSubscriptionAdapter<Object> methodAdapter;
   private ExecutorService service;
   private boolean enabled = false;
 
   @Inject
-  public ProtocolEvent(final Logger logger,
-                       final PacketRemapper remapper) {
+  public ProtocolEvent(final Logger logger) {
     this.logger = logger;
-    this.remapper = remapper;
   }
 
   public void enable() {

@@ -24,6 +24,7 @@
  */
 package com.ichorpowered.protocolcontrol.service;
 
+import com.ichorpowered.protocolcontrol.ProtocolChannel;
 import com.ichorpowered.protocolcontrol.ProtocolEvent;
 import com.ichorpowered.protocolcontrol.packet.PacketRemapper;
 import com.google.inject.Inject;
@@ -31,23 +32,31 @@ import com.google.inject.Singleton;
 
 @Singleton
 public final class SimpleProtocolService implements ProtocolService {
+  private final ProtocolChannel channels;
+  private final ProtocolEvent events;
   private final PacketRemapper remapper;
-  private final ProtocolEvent event;
 
   @Inject
-  public SimpleProtocolService(final PacketRemapper remapper,
-                               final ProtocolEvent event) {
+  public SimpleProtocolService(final ProtocolChannel channels,
+                               final ProtocolEvent events,
+                               final PacketRemapper remapper) {
+    this.channels = channels;
+    this.events = events;
     this.remapper = remapper;
-    this.event = event;
+  }
+
+  @Override
+  public ProtocolChannel channels() {
+    return null;
+  }
+
+  @Override
+  public ProtocolEvent events() {
+    return this.events;
   }
 
   @Override
   public PacketRemapper remapper() {
     return this.remapper;
-  }
-
-  @Override
-  public ProtocolEvent events() {
-    return this.event;
   }
 }
