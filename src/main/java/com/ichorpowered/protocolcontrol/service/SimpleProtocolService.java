@@ -47,7 +47,7 @@ public final class SimpleProtocolService implements ProtocolService {
 
   @Override
   public ProtocolChannel channels() {
-    return null;
+    return this.channels;
   }
 
   @Override
