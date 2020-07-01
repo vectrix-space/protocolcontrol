@@ -78,8 +78,8 @@ public final class ProtocolPlugin {
 
   @Listener(order = Order.LAST)
   public void onGameStopped(final GameStoppingServerEvent event) {
-    if (this.protocolEvent != null && this.protocolEvent.enabled()) this.protocolEvent.disable();
-    if (this.protocolInjector != null && this.protocolInjector.enabled()) this.protocolInjector.disable();
+    if(this.protocolEvent != null && this.protocolEvent.enabled()) this.protocolEvent.disable();
+    if(this.protocolInjector != null && this.protocolInjector.enabled()) this.protocolInjector.disable();
 
     this.logger.info("Gracefully stopped " + this.plugin.getName());
   }

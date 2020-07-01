@@ -56,7 +56,7 @@ public final class ProtocolInjector {
   }
 
   public void enable() {
-    if (this.enabled) return;
+    if(this.enabled) return;
 
     try {
       final Field networkField = MinecraftServer.class.getDeclaredField("field_147144_o");
@@ -65,12 +65,12 @@ public final class ProtocolInjector {
       final Field endpointsField = networkSystem.getClass().getDeclaredField("field_151274_e");
       final List<ChannelFuture> channelFutures = (List<ChannelFuture>) endpointsField.get(networkSystem);
 
-      for (final ChannelFuture future : channelFutures) {
+      for(final ChannelFuture future : channelFutures) {
         future.channel().pipeline().addFirst(this.initializer);
       }
 
       this.enabled = true;
-    } catch (Throwable throwable) {
+    } catch(Throwable throwable) {
       Exceptions.catchingReport(
         throwable,
         this.logger,
@@ -82,7 +82,7 @@ public final class ProtocolInjector {
   }
 
   public void disable() {
-    if (!this.enabled) return;
+    if(!this.enabled) return;
 
     try {
       final Field networkField = MinecraftServer.class.getDeclaredField("field_147144_o");
@@ -91,12 +91,12 @@ public final class ProtocolInjector {
       final Field channelField = networkSystem.getClass().getDeclaredField("field_151274_e");
       final List<ChannelFuture> channelFutures = (List<ChannelFuture>) channelField.get(networkSystem);
 
-      for (final ChannelFuture future : channelFutures) {
+      for(final ChannelFuture future : channelFutures) {
         future.channel().pipeline().remove(this.initializer);
       }
 
       this.enabled = false;
-    } catch (Throwable throwable) {
+    } catch(Throwable throwable) {
       Exceptions.catchingReport(
         throwable,
         this.logger,

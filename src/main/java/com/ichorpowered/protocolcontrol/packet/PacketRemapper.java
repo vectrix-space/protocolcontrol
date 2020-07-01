@@ -27,7 +27,6 @@ package com.ichorpowered.protocolcontrol.packet;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import io.netty.util.Recycler;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -61,15 +60,25 @@ public final class PacketRemapper {
   }
 
   /**
+   * Returns a {@link Structure} instance of the specified {@code T} packet.
+   *
+   * @param packet the packet class
+   * @param <T> the packet type
+   * @return the packet structure
+   */
+  public <T> Structure<T> structure(final Class<?> packet) {
+    return (Structure<T>) this.structures.computeIfAbsent(packet, key -> Structure.generate(this.logger, this.lookup, key));
+  }
+
+  /**
    * Returns a {@link Wrapped} instance of the specified {@code T} packet.
    *
    * @param packet the packet
    * @param <T> the packet type
-   * @return the wrapper packet
+   * @return the packet wrapper
    */
   public <T> Wrapped<T> wrap(final T packet) {
-    final Structure<T> structure = (Structure<T>) this.structures.computeIfAbsent(packet.getClass(), key -> Structure.generate(this.logger, this.lookup, key));
-    return new Wrapped<>(packet, structure);
+    return new Wrapped<>(packet, this.structure(packet.getClass()));
   }
 
   /**

@@ -26,6 +26,7 @@ package com.ichorpowered.protocolcontrol.channel;
 
 import com.ichorpowered.protocolcontrol.ProtocolEvent;
 import com.ichorpowered.protocolcontrol.packet.PacketHandler;
+import com.ichorpowered.protocolcontrol.packet.PacketRemapper;
 import com.ichorpowered.protocolcontrol.util.Exceptions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -38,14 +39,17 @@ import org.slf4j.Logger;
 public final class ChannelInitializer extends ChannelInboundHandlerAdapter {
   private final Logger logger;
   private final ProtocolEvent event;
+  private final PacketRemapper remapper;
   private final ChannelProfile.Factory profileFactory;
 
   @Inject
   public ChannelInitializer(final Logger logger,
                             final ProtocolEvent event,
+                            final PacketRemapper remapper,
                             final ChannelProfile.Factory profileFactory) {
     this.logger = logger;
     this.event = event;
+    this.remapper = remapper;
     this.profileFactory = profileFactory;
   }
 
@@ -54,10 +58,10 @@ public final class ChannelInitializer extends ChannelInboundHandlerAdapter {
     try {
       final Channel channel = (Channel) message;
       final ChannelProfile profile = this.profileFactory.create(channel);
-      final PacketHandler handler = new PacketHandler(this.logger, this.event, profile);
+      final PacketHandler handler = new PacketHandler(this.logger, this.event, this.remapper, profile);
 
       channel.pipeline().addLast(handler);
-    } catch (Throwable throwable) {
+    } catch(Throwable throwable) {
       Exceptions.catchingReport(
         throwable,
         this.logger,

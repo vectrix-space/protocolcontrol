@@ -115,16 +115,16 @@ public final class ChannelProfile {
    * @param <T> the packet type
    */
   public <T extends Packet<?>> void send(final PacketDirection direction, final T packet, final boolean currentThread) {
-    if (direction == PacketDirection.INCOMING) {
+    if(direction == PacketDirection.INCOMING) {
       final ChannelHandlerContext context = this.channel.pipeline().context(ProtocolInjector.OUTGOING_HANDLER);
-      if (currentThread) {
+      if(currentThread) {
         this.read(context, packet);
       } else {
         this.channel.eventLoop().execute(() -> this.read(context, packet));
       }
     } else {
       final ChannelHandlerContext context = this.channel.pipeline().context(ProtocolInjector.INCOMING_HANDLER);
-      if (currentThread) {
+      if(currentThread) {
         context.write(packet, this.channel.voidPromise());
       } else {
         this.channel.eventLoop().execute(() -> context.write(packet, this.channel.voidPromise()));
@@ -133,7 +133,7 @@ public final class ChannelProfile {
   }
 
   private void read(final ChannelHandlerContext context, final Object message) {
-    if (context != null) {
+    if(context != null) {
       context.fireChannelRead(message);
     } else {
       this.channel.pipeline().fireChannelRead(message);

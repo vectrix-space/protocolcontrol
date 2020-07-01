@@ -36,7 +36,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
-import java.lang.reflect.Field;
 import net.minecraft.network.Packet;
 import net.minecraft.network.login.server.SPacketLoginSuccess;
 import org.slf4j.Logger;
@@ -45,14 +44,17 @@ import org.slf4j.Logger;
 public final class PacketHandler extends ChannelDuplexHandler {
   private final Logger logger;
   private final ProtocolEvent event;
+  private final PacketRemapper remapper;
   private final ChannelProfile profile;
   private boolean injected = false;
 
   public PacketHandler(final Logger logger,
                        final ProtocolEvent event,
+                       final PacketRemapper remapper,
                        final ChannelProfile profile) {
     this.logger = logger;
     this.event = event;
+    this.remapper = remapper;
     this.profile = profile;
   }
 
@@ -71,7 +73,7 @@ public final class PacketHandler extends ChannelDuplexHandler {
   @Override
   public void channelActive(final ChannelHandlerContext context) throws Exception {
     try {
-      if (!this.injected) {
+      if(!this.injected) {
         final Incoming incoming = new Incoming(this);
         final Outgoing outgoing = new Outgoing(this);
 
@@ -79,11 +81,13 @@ public final class PacketHandler extends ChannelDuplexHandler {
         context.pipeline().addAfter("decoder", ProtocolInjector.INCOMING_HANDLER, incoming);
         context.pipeline().addAfter("packet_handler", ProtocolInjector.OUTGOING_HANDLER, outgoing);
 
+        this.remapper.structure(SPacketLoginSuccess.class); // Prepare the structure early.
+
         this.profile.active(true);
 
         this.injected = true;
       }
-    } catch (Throwable throwable) {
+    } catch(Throwable throwable) {
       Exceptions.catchingReport(
         throwable,
         this.logger,
@@ -99,13 +103,13 @@ public final class PacketHandler extends ChannelDuplexHandler {
   @Override
   public void write(final ChannelHandlerContext context, final Object message, final ChannelPromise promise) throws Exception {
     try {
-      if (message instanceof SPacketLoginSuccess) {
-        final Field field = SPacketLoginSuccess.class.getDeclaredField("field_149602_a");
-        final GameProfile profile = (GameProfile) field.get(message);
+      if(message instanceof SPacketLoginSuccess) {
+        final PacketRemapper.Wrapped<SPacketLoginSuccess> wrapped = this.remapper.wrap((SPacketLoginSuccess) message);
+        final GameProfile profile = wrapped.get(GameProfile.class, 0);
 
         this.profile.player(profile.getId());
       }
-    } catch (Throwable throwable) {
+    } catch(Throwable throwable) {
       Exceptions.catchingReport(
         throwable,
         this.logger,
@@ -120,7 +124,7 @@ public final class PacketHandler extends ChannelDuplexHandler {
 
   @Override
   public void channelInactive(final ChannelHandlerContext context) throws Exception {
-    if (this.injected) this.profile.active(false);
+    if(this.injected) this.profile.active(false);
 
     super.channelInactive(context);
   }
@@ -135,14 +139,14 @@ public final class PacketHandler extends ChannelDuplexHandler {
     @Override
     public void channelRead(final ChannelHandlerContext context, Object message) throws Exception {
       try {
-        if (message instanceof Packet) {
+        if(message instanceof Packet) {
           final PacketEvent<?> packetEvent = new PacketEvent<>(this.handler.profile(), PacketDirection.INCOMING, (Packet<?>) message);
           this.handler.event().fire(packetEvent).get();
 
-          if (packetEvent.cancel()) return;
+          if(packetEvent.cancel()) return;
           message = packetEvent.packet();
         }
-      } catch (Throwable throwable) {
+      } catch(Throwable throwable) {
         Exceptions.catchingReport(
           throwable,
           this.handler.logger(),
@@ -166,14 +170,14 @@ public final class PacketHandler extends ChannelDuplexHandler {
     @Override
     public void write(final ChannelHandlerContext context, Object message, final ChannelPromise promise) throws Exception {
       try {
-        if (message instanceof Packet) {
+        if(message instanceof Packet) {
           final PacketEvent<?> packetEvent = new PacketEvent<>(this.handler.profile(), PacketDirection.OUTGOING, (Packet<?>) message);
           this.handler.event().fire(packetEvent).get();
 
-          if (packetEvent.cancel()) return;
+          if(packetEvent.cancel()) return;
           message = packetEvent.packet();
         }
-      } catch (Throwable throwable) {
+      } catch(Throwable throwable) {
         Exceptions.catchingReport(
           throwable,
           this.handler.logger(),

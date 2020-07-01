@@ -48,7 +48,7 @@ public final class Exceptions {
                                     final String category, final String message) {
     try {
       throwingRunnable.throwingRun();
-    } catch (final Throwable throwable) {
+    } catch(final Throwable throwable) {
       Exceptions.catchingReport(
         throwable,
         logger,
@@ -101,7 +101,7 @@ public final class Exceptions {
                                     final Consumer<DetailedReport> reportFiller) {
     try {
       throwingRunnable.throwingRun();
-    } catch (final Throwable throwable) {
+    } catch(final Throwable throwable) {
       Exceptions.catchingReport(
         throwable,
         logger,

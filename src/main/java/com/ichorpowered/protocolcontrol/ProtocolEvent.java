@@ -60,7 +60,7 @@ public final class ProtocolEvent {
   }
 
   public void enable() {
-    if (this.enabled) return;
+    if(this.enabled) return;
 
     this.service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactoryBuilder()
       .setNameFormat("ProtocolControl Network Executor - #%d")
@@ -73,7 +73,7 @@ public final class ProtocolEvent {
   }
 
   public void disable() {
-    if (!this.enabled) return;
+    if(!this.enabled) return;
 
     this.bus.unregisterAll();
     this.service.shutdownNow();
@@ -90,7 +90,7 @@ public final class ProtocolEvent {
    * @param listener the packet listener
    */
   public void register(final Object listener) {
-    if (!this.enabled) return;
+    if(!this.enabled) return;
     this.methodAdapter.register(listener);
   }
 
@@ -100,7 +100,7 @@ public final class ProtocolEvent {
    * @param listener the packet listener
    */
   public void unregister(final Object listener) {
-    if (!this.enabled) return;
+    if(!this.enabled) return;
     this.methodAdapter.unregister(listener);
   }
 
@@ -113,8 +113,8 @@ public final class ProtocolEvent {
    * @return a completable future
    */
   public <T extends Packet<?>> CompletableFuture<PacketEvent<T>> fire(final PacketEvent<T> event) {
-    if (!this.enabled) return CompletableFuture.completedFuture(event);
-    if (!this.bus.hasSubscribers(event.getClass())) return CompletableFuture.completedFuture(event);
+    if(!this.enabled) return CompletableFuture.completedFuture(event);
+    if(!this.bus.hasSubscribers(event.getClass())) return CompletableFuture.completedFuture(event);
 
     final CompletableFuture<PacketEvent<T>> eventFuture = new CompletableFuture<>();
     this.service.execute(() -> {
@@ -133,15 +133,15 @@ public final class ProtocolEvent {
    * @param <T> the packet type
    */
   public <T extends Packet<?>> void fireAndForget(final PacketEvent<T> event) {
-    if (!this.enabled) return;
-    if (!this.bus.hasSubscribers(event.getClass())) return;
+    if(!this.enabled) return;
+    if(!this.bus.hasSubscribers(event.getClass())) return;
     this.service.execute(() -> this.postEvent(event));
   }
 
   private <T extends Packet<?>> void postEvent(final PacketEvent<T> event) {
     final PostResult result = this.bus.post(event);
     final Collection<Throwable> exceptions = result.exceptions().values();
-    for (final Throwable throwable : exceptions) {
+    for(final Throwable throwable : exceptions) {
       Exceptions.catchingReport(
         throwable,
         this.logger,
