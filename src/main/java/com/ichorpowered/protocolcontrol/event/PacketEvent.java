@@ -31,6 +31,8 @@ import net.kyori.event.ReifiedEvent;
 import net.minecraft.network.Packet;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * An immutable event containing the {@code T} packet, the
  * {@link PacketDirection} and the {@link ChannelProfile} which
@@ -47,12 +49,12 @@ public final class PacketEvent<T extends Packet<?>> implements ReifiedEvent<T> {
   private T packet;
   private boolean cancel = false;
 
-  public PacketEvent(final ChannelProfile profile,
-                     final PacketDirection direction,
-                     final T packet) {
-    this.profile = profile;
-    this.direction = direction;
-    this.packet = packet;
+  public PacketEvent(final @NonNull ChannelProfile profile,
+                     final @NonNull PacketDirection direction,
+                     final @NonNull T packet) {
+    this.profile = requireNonNull(profile, "profile");
+    this.direction = requireNonNull(direction, "direction");
+    this.packet = requireNonNull(packet, "packet");
   }
 
   /**
@@ -60,7 +62,7 @@ public final class PacketEvent<T extends Packet<?>> implements ReifiedEvent<T> {
    *
    * @return the channel profile
    */
-  public ChannelProfile profile() {
+  public @NonNull ChannelProfile profile() {
     return this.profile;
   }
 
@@ -69,7 +71,7 @@ public final class PacketEvent<T extends Packet<?>> implements ReifiedEvent<T> {
    *
    * @return the packet direction
    */
-  public PacketDirection direction() {
+  public @NonNull PacketDirection direction() {
     return this.direction;
   }
 
@@ -78,7 +80,7 @@ public final class PacketEvent<T extends Packet<?>> implements ReifiedEvent<T> {
    *
    * @return the packet object
    */
-  public T packet() {
+  public @NonNull T packet() {
     return this.packet;
   }
 
@@ -87,8 +89,8 @@ public final class PacketEvent<T extends Packet<?>> implements ReifiedEvent<T> {
    *
    * @param packet the packet object
    */
-  public void packet(final T packet) {
-    this.packet = packet;
+  public void packet(final @NonNull T packet) {
+    this.packet = requireNonNull(packet, "packet");
   }
 
   /**

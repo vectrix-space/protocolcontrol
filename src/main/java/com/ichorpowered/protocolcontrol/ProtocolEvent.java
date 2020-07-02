@@ -40,7 +40,10 @@ import net.kyori.event.method.MethodSubscriptionAdapter;
 import net.kyori.event.method.SimpleMethodSubscriptionAdapter;
 import net.kyori.event.method.asm.ASMEventExecutorFactory;
 import net.minecraft.network.Packet;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
+
+import static java.util.Objects.requireNonNull;
 
 @Singleton
 public final class ProtocolEvent {
@@ -85,9 +88,8 @@ public final class ProtocolEvent {
    *
    * @param listener the packet listener
    */
-  public void register(final Object listener) {
-    if(!this.enabled) return;
-    this.methodAdapter.register(listener);
+  public void register(final @NonNull Object listener) {
+    this.methodAdapter.register(requireNonNull(listener, "listener"));
   }
 
   /**
@@ -95,9 +97,8 @@ public final class ProtocolEvent {
    *
    * @param listener the packet listener
    */
-  public void unregister(final Object listener) {
-    if(!this.enabled) return;
-    this.methodAdapter.unregister(listener);
+  public void unregister(final @NonNull Object listener) {
+    this.methodAdapter.unregister(requireNonNull(listener, "listener"));
   }
 
   /**
@@ -108,7 +109,8 @@ public final class ProtocolEvent {
    * @param <T> the packet type
    * @return a completable future
    */
-  public <T extends Packet<?>> CompletableFuture<PacketEvent<T>> fire(final PacketEvent<T> event) {
+  public <T extends Packet<?>> @NonNull CompletableFuture<PacketEvent<T>> fire(final @NonNull PacketEvent<T> event) {
+    requireNonNull(event, "event");
     if(!this.enabled) return CompletableFuture.completedFuture(event);
     if(!this.bus.hasSubscribers(event.getClass())) return CompletableFuture.completedFuture(event);
 
@@ -128,13 +130,14 @@ public final class ProtocolEvent {
    * @param event the packet event
    * @param <T> the packet type
    */
-  public <T extends Packet<?>> void fireAndForget(final PacketEvent<T> event) {
+  public <T extends Packet<?>> void fireAndForget(final @NonNull PacketEvent<T> event) {
+    requireNonNull(event, "event");
     if(!this.enabled) return;
     if(!this.bus.hasSubscribers(event.getClass())) return;
     this.service.execute(() -> this.postEvent(event));
   }
 
-  private <T extends Packet<?>> void postEvent(final PacketEvent<T> event) {
+  private <T extends Packet<?>> void postEvent(final @NonNull PacketEvent<T> event) {
     final PostResult result = this.bus.post(event);
     final Collection<Throwable> exceptions = result.exceptions().values();
     for(final Throwable throwable : exceptions) {

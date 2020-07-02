@@ -29,6 +29,7 @@ import com.ichorpowered.protocolcontrol.ProtocolEvent;
 import com.ichorpowered.protocolcontrol.packet.PacketRemapper;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 @Singleton
 public final class SimpleProtocolService implements ProtocolService {
@@ -46,17 +47,17 @@ public final class SimpleProtocolService implements ProtocolService {
   }
 
   @Override
-  public ProtocolChannel channels() {
+  public @NonNull ProtocolChannel channels() {
     return this.channels;
   }
 
   @Override
-  public ProtocolEvent events() {
+  public @NonNull ProtocolEvent events() {
     return this.events;
   }
 
   @Override
-  public PacketRemapper remapper() {
+  public @NonNull PacketRemapper remapper() {
     return this.remapper;
   }
 }

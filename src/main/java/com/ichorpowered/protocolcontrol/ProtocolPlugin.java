@@ -71,6 +71,8 @@ public final class ProtocolPlugin {
     this.protocolInjector = childInjector.getInstance(ProtocolInjector.class);
 
     this.protocolInjector.setup();
+    this.protocolChannel.enable();
+    this.protocolEvent.enable();
 
     final ProtocolService protocolService = childInjector.getInstance(ProtocolService.class);
     Sponge.getServiceManager().setProvider(this, ProtocolService.class, protocolService);
@@ -78,8 +80,6 @@ public final class ProtocolPlugin {
 
   @Listener(order = Order.FIRST)
   public void onGameStarting(final GamePostInitializationEvent event) {
-    this.protocolChannel.enable();
-    this.protocolEvent.enable();
     this.protocolInjector.enable();
 
     this.logger.info("Successfully injected " + this.plugin.getName() + " version " + this.plugin.getVersion().orElse("UNKNOWN"));

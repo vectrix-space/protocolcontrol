@@ -29,7 +29,10 @@ import com.google.inject.Singleton;
 import com.ichorpowered.protocolcontrol.channel.ChannelProfile;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+
+import static java.util.Objects.requireNonNull;
 
 @Singleton
 public final class ProtocolChannel {
@@ -55,11 +58,22 @@ public final class ProtocolChannel {
   /**
    * Sets the specified player {@link ChannelProfile}.
    *
+   * @param profile the profile
+   */
+  public void add(final @NonNull ChannelProfile profile) {
+    requireNonNull(profile, "profile");
+    this.channels.putIfAbsent(requireNonNull(profile.player(), "player"), profile);
+  }
+
+  /**
+   * Sets the specified player {@link ChannelProfile}.
+   *
    * @param player the player
    * @param profile the channel profile
    */
-  public void set(final UUID player, final ChannelProfile profile) {
-    this.channels.putIfAbsent(player, profile);
+  public void set(final @NonNull UUID player, final @NonNull ChannelProfile profile) {
+    requireNonNull(profile, "profile");
+    this.channels.putIfAbsent(requireNonNull(player, "player"), profile);
   }
 
   /**
@@ -67,8 +81,8 @@ public final class ProtocolChannel {
    *
    * @param player the player
    */
-  public void clear(final UUID player) {
-    this.channels.remove(player);
+  public void clear(final @NonNull UUID player) {
+    this.channels.remove(requireNonNull(player, "player"));
   }
 
   /**
@@ -78,8 +92,7 @@ public final class ProtocolChannel {
    * @param player the player
    * @return the channel profile, if present
    */
-  @Nullable
-  public ChannelProfile profile(final UUID player) {
-    return this.channels.get(player);
+  public @Nullable ChannelProfile profile(final @NonNull UUID player) {
+    return this.channels.get(requireNonNull(player, "player"));
   }
 }

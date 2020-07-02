@@ -37,9 +37,13 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
+import java.util.UUID;
 import net.minecraft.network.Packet;
 import net.minecraft.network.login.server.SPacketLoginSuccess;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
+
+import static java.util.Objects.requireNonNull;
 
 @ChannelHandler.Sharable
 public final class PacketHandler extends ChannelDuplexHandler {
@@ -50,27 +54,27 @@ public final class PacketHandler extends ChannelDuplexHandler {
   private final ChannelProfile profile;
   private boolean injected = false;
 
-  public PacketHandler(final Logger logger,
-                       final ProtocolChannel channels,
-                       final ProtocolEvent events,
-                       final PacketRemapper remapper,
-                       final ChannelProfile profile) {
-    this.logger = logger;
-    this.channels = channels;
-    this.events = events;
-    this.remapper = remapper;
-    this.profile = profile;
+  public PacketHandler(final @NonNull Logger logger,
+                       final @NonNull ProtocolChannel channels,
+                       final @NonNull ProtocolEvent events,
+                       final @NonNull PacketRemapper remapper,
+                       final @NonNull ChannelProfile profile) {
+    this.logger = requireNonNull(logger, "logger");
+    this.channels = requireNonNull(channels, "channels");
+    this.events = requireNonNull(events, "events");
+    this.remapper = requireNonNull(remapper, "remapper");
+    this.profile = requireNonNull(profile, "profile");
   }
 
-  public Logger logger() {
+  public @NonNull Logger logger() {
     return this.logger;
   }
 
-  public ProtocolEvent event() {
+  public @NonNull ProtocolEvent event() {
     return this.events;
   }
 
-  public ChannelProfile profile() {
+  public @NonNull ChannelProfile profile() {
     return this.profile;
   }
 
@@ -110,10 +114,13 @@ public final class PacketHandler extends ChannelDuplexHandler {
       if(message instanceof SPacketLoginSuccess) {
         final PacketRemapper.Wrapped<SPacketLoginSuccess> wrapped = this.remapper.wrap((SPacketLoginSuccess) message);
         final GameProfile profile = wrapped.get(GameProfile.class, 0);
-        assert profile != null;
 
-        this.profile.player(profile.getId());
-        this.channels.set(this.profile.player(), this.profile);
+        if(profile != null) {
+          this.profile.player(profile.getId());
+          this.channels.add(this.profile);
+        } else {
+          this.logger.warn("Failed to acquire player on login for a connected channel.");
+        }
       }
     } catch(Throwable throwable) {
       Exceptions.catchingReport(
@@ -131,7 +138,9 @@ public final class PacketHandler extends ChannelDuplexHandler {
   @Override
   public void channelInactive(final ChannelHandlerContext context) throws Exception {
     if(this.injected) {
-      this.channels.clear(this.profile.player());
+      final UUID player = this.profile.player();
+      if(player != null) this.channels.clear(player);
+
       this.profile.active(false);
     }
 
@@ -141,7 +150,7 @@ public final class PacketHandler extends ChannelDuplexHandler {
   protected static class Incoming extends ChannelInboundHandlerAdapter {
     private final PacketHandler handler;
 
-    public Incoming(final PacketHandler handler) {
+    public Incoming(final @NonNull PacketHandler handler) {
       this.handler = handler;
     }
 
@@ -172,7 +181,7 @@ public final class PacketHandler extends ChannelDuplexHandler {
   protected static class Outgoing extends ChannelOutboundHandlerAdapter {
     private final PacketHandler handler;
 
-    public Outgoing(final PacketHandler handler) {
+    public Outgoing(final @NonNull PacketHandler handler) {
       this.handler = handler;
     }
 

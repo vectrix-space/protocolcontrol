@@ -39,6 +39,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * An efficient packet remapping processor that maps packet
  * fields to their types & order. This can then be used to
@@ -67,8 +69,9 @@ public final class PacketRemapper {
    * @param <T> the packet type
    * @return the packet structure
    */
-  public <T> Structure<T> structure(final Class<?> packet) {
-    return (Structure<T>) this.structures.computeIfAbsent(packet, key -> Structure.generate(this.logger, this.lookup, key));
+  public <T> @NonNull Structure<T> structure(final @NonNull Class<?> packet) {
+    return (Structure<T>) this.structures.computeIfAbsent(requireNonNull(packet, "packet"), key ->
+      Structure.generate(this.logger, this.lookup, key));
   }
 
   /**
@@ -78,8 +81,8 @@ public final class PacketRemapper {
    * @param <T> the packet type
    * @return the packet wrapper
    */
-  public <T> Wrapped<T> wrap(final T packet) {
-    return new Wrapped<>(packet, this.structure(packet.getClass()));
+  public <T> @NonNull Wrapped<T> wrap(final @NonNull T packet) {
+    return new Wrapped<>(requireNonNull(packet, "packet"), this.structure(packet.getClass()));
   }
 
   /**
@@ -95,9 +98,9 @@ public final class PacketRemapper {
     private final T packet;
     private final Structure<T> structure;
 
-    private Wrapped(final T packet, final Structure<T> structure) {
-      this.packet = packet;
-      this.structure = structure;
+    /* package */ Wrapped(final @NonNull T packet, final @NonNull Structure<T> structure) {
+      this.packet = requireNonNull(packet, "packet");
+      this.structure = requireNonNull(structure, "structure");
     }
 
     /**
@@ -105,7 +108,7 @@ public final class PacketRemapper {
      *
      * @return the packet
      */
-    public T packet() {
+    public @NonNull T packet() {
       return this.packet;
     }
 
@@ -121,10 +124,9 @@ public final class PacketRemapper {
      * @throws Throwable exceptions attempting to locate or parse
      *                   the field or the fields element
      */
-    @Nullable
-    public <E> E get(final Class<E> type, final int index) throws Throwable {
-      final MethodHandle handle = this.structure.getter(type, index);
-      if (handle == null) throw new IllegalStateException("Unable to locate method handle");
+    public <E> @Nullable E get(final @NonNull Class<E> type, final int index) throws Throwable {
+      final MethodHandle handle = this.structure.getter(requireNonNull(type, "type"), index);
+      if(handle == null) throw new IllegalStateException("Unable to locate method handle");
 
       final Object field = handle.invoke(this.packet());
       return field != null ? type.cast(field) : null;
@@ -141,9 +143,9 @@ public final class PacketRemapper {
      * @param <E> the element type
      * @throws Throwable exceptions attempting to locate the field
      */
-    public <E> void set(final Class<E> type, final int index, final E value) throws Throwable {
-      final MethodHandle handle = this.structure.setter(type, index);
-      if (handle == null) throw new IllegalStateException("Unable to locate method handle");
+    public <E> void set(final @NonNull Class<E> type, final int index, final @Nullable E value) throws Throwable {
+      final MethodHandle handle = this.structure.setter(requireNonNull(type, "type"), index);
+      if(handle == null) throw new IllegalStateException("Unable to locate method handle");
 
       handle.invoke(this.packet(), value);
     }
@@ -159,7 +161,7 @@ public final class PacketRemapper {
      */
     public int getInt(final int index) throws Throwable {
       final MethodHandle handle = this.structure.getter(int.class, index);
-      if (handle == null) throw new IllegalStateException("Unable to locate method handle");
+      if(handle == null) throw new IllegalStateException("Unable to locate method handle");
 
       final Object field = handle.invoke(this.packet());
       return field != null ? (int) field : 0;
@@ -175,7 +177,7 @@ public final class PacketRemapper {
      */
     public void setInt(final int index, final int value) throws Throwable {
       final MethodHandle handle = this.structure.setter(int.class, index);
-      if (handle == null) throw new IllegalStateException("Unable to locate method handle");
+      if(handle == null) throw new IllegalStateException("Unable to locate method handle");
 
       handle.invoke(this.packet(), value);
     }
@@ -191,7 +193,7 @@ public final class PacketRemapper {
      */
     public double getDouble(final int index) throws Throwable {
       final MethodHandle handle = this.structure.getter(double.class, index);
-      if (handle == null) throw new IllegalStateException("Unable to locate method handle");
+      if(handle == null) throw new IllegalStateException("Unable to locate method handle");
 
       final Object field = handle.invoke(this.packet());
       return field != null ? (double) field : 0D;
@@ -207,7 +209,7 @@ public final class PacketRemapper {
      */
     public void setDouble(final int index, final double value) throws Throwable {
       final MethodHandle handle = this.structure.setter(double.class, index);
-      if (handle == null) throw new IllegalStateException("Unable to locate method handle");
+      if(handle == null) throw new IllegalStateException("Unable to locate method handle");
 
       handle.invoke(this.packet(), value);
     }
@@ -221,19 +223,20 @@ public final class PacketRemapper {
    * @param <T> the packet type
    */
   public static final class Structure<T> {
-    public static <E> Structure<E> generate(final Logger logger, final MethodHandles.Lookup lookup, final Class<E> packet) {
+    private static <E> @NonNull Structure<E> generate(final @NonNull Logger logger, final MethodHandles.@NonNull Lookup lookup,
+                                                      final @NonNull Class<E> packet) {
       final Map<Class<?>, List<Handle>> handleMap = Maps.newHashMap();
 
       // Search function to grab fields from the packet class and other super classes.
       Structure.find(packet, Class::getSuperclass, fields -> {
-        for (int i = 0; i < fields.length; i++) {
+        for(int i = 0; i < fields.length; i++) {
           try {
             final Field field = fields[i];
             field.setAccessible(true);
 
             final List<Handle> methodHandles = handleMap.computeIfAbsent(field.getType(), key -> new ArrayList<>());
             methodHandles.add(new Handle(lookup.unreflectGetter(field), lookup.unreflectSetter(field)));
-          } catch (IllegalAccessException e) {
+          } catch(IllegalAccessException e) {
             logger.error("Unable to access packet structure field", e);
           }
         }
@@ -242,9 +245,10 @@ public final class PacketRemapper {
       return new Structure<>(packet, handleMap);
     }
 
-    public static void find(final Class<?> search, final Function<Class<?>, Class<?>> superSearch, final Consumer<Field[]> fieldSearch) {
+    private static void find(final @NonNull Class<?> search, final @NonNull Function<Class<?>, Class<?>> superSearch,
+                             final @NonNull Consumer<Field[]> fieldSearch) {
       Class<?> searchClass = search;
-      while (searchClass != null) {
+      while(searchClass != null) {
         final Field[] fields = searchClass.getDeclaredFields();
         fieldSearch.accept(fields);
 
@@ -255,27 +259,26 @@ public final class PacketRemapper {
     private final Class<T> packet;
     private final Map<Class<?>, List<Handle>> handles;
 
-    public Structure(final Class<T> packet,
-                     final Map<Class<?>, List<Handle>> handles) {
+    /* package */ Structure(final @NonNull Class<T> packet, final @NonNull Map<Class<?>, List<Handle>> handles) {
       this.packet = packet;
       this.handles = handles;
     }
 
-    public Class<T> packet() {
+    public @NonNull Class<T> packet() {
       return this.packet;
     }
 
-    @Nullable
-    public MethodHandle getter(final Class<?> type, final int index) {
+    public @Nullable MethodHandle getter(final @NonNull Class<?> type, final int index) {
+      requireNonNull(type, "type");
       final List<Handle> handles = this.handles.get(type);
-      if (handles == null || index < 0 || index >= handles.size()) return null;
+      if(handles == null || index < 0 || index >= handles.size()) return null;
       return handles.get(index).getter();
     }
 
-    @Nullable
-    public MethodHandle setter(final Class<?> type, final int index) {
+    public @Nullable MethodHandle setter(final @NonNull Class<?> type, final int index) {
+      requireNonNull(type, "type");
       final List<Handle> handles = this.handles.get(type);
-      if (handles == null || index < 0 || index >= handles.size()) return null;
+      if(handles == null || index < 0 || index >= handles.size()) return null;
       return handles.get(index).setter();
     }
   }
@@ -284,18 +287,16 @@ public final class PacketRemapper {
     private final MethodHandle getter;
     private final MethodHandle setter;
 
-    public Handle(final @NonNull MethodHandle getter, final @NonNull MethodHandle setter) {
+    /* package */ Handle(final @NonNull MethodHandle getter, final @NonNull MethodHandle setter) {
       this.getter = getter;
       this.setter = setter;
     }
 
-    @NonNull
-    public MethodHandle getter() {
+    public @NonNull MethodHandle getter() {
       return this.getter;
     }
 
-    @NonNull
-    public MethodHandle setter() {
+    public @NonNull MethodHandle setter() {
       return this.setter;
     }
   }

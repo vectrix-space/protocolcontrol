@@ -32,6 +32,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import java.util.UUID;
 import net.minecraft.network.Packet;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 public final class ChannelProfile {
@@ -50,7 +51,7 @@ public final class ChannelProfile {
    *
    * @return the channel
    */
-  public Channel channel() {
+  public @NonNull Channel channel() {
     return this.channel;
   }
 
@@ -59,8 +60,7 @@ public final class ChannelProfile {
    *
    * @return the player
    */
-  @Nullable
-  public UUID player() {
+  public @Nullable UUID player() {
     return this.player;
   }
 
@@ -69,7 +69,7 @@ public final class ChannelProfile {
    *
    * @param player the player
    */
-  public void player(final UUID player) {
+  public void player(final @Nullable UUID player) {
     this.player = player;
   }
 
@@ -100,7 +100,7 @@ public final class ChannelProfile {
    * @param packet the packet
    * @param <T> the packet type
    */
-  public <T extends Packet<?>> void send(final PacketDirection direction, final T packet) {
+  public <T extends Packet<?>> void send(final @NonNull PacketDirection direction, final @NonNull T packet) {
     this.send(direction, packet, false);
   }
 
@@ -114,7 +114,8 @@ public final class ChannelProfile {
    *                      post to the event loop
    * @param <T> the packet type
    */
-  public <T extends Packet<?>> void send(final PacketDirection direction, final T packet, final boolean currentThread) {
+  public <T extends Packet<?>> void send(final @NonNull PacketDirection direction, final @NonNull T packet,
+                                         final boolean currentThread) {
     if(direction == PacketDirection.INCOMING) {
       final ChannelHandlerContext context = this.channel.pipeline().context(ProtocolInjector.INCOMING_HANDLER);
       if(currentThread) {
@@ -132,7 +133,7 @@ public final class ChannelProfile {
     }
   }
 
-  private void read(final ChannelHandlerContext context, final Object message) {
+  private void read(final @Nullable ChannelHandlerContext context, final @NonNull Object message) {
     if(context != null) {
       context.fireChannelRead(message);
     } else {

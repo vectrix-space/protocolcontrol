@@ -27,6 +27,7 @@ package com.ichorpowered.protocolcontrol.util;
 import java.util.function.Consumer;
 import net.kyori.indigo.DetailedReport;
 import net.kyori.mu.function.ThrowingRunnable;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 
 public final class Exceptions {
@@ -43,9 +44,9 @@ public final class Exceptions {
    * @param category The root category name
    * @param message The root message
    */
-  public static void catchingReport(final ThrowingRunnable<Throwable> throwingRunnable,
-                                    final Logger logger, final Class<?> source,
-                                    final String category, final String message) {
+  public static void catchingReport(final @NonNull ThrowingRunnable<Throwable> throwingRunnable,
+                                    final @NonNull Logger logger, final @NonNull Class<?> source,
+                                    final @NonNull String category, final @NonNull String message) {
     try {
       throwingRunnable.throwingRun();
     } catch(final Throwable throwable) {
@@ -71,9 +72,9 @@ public final class Exceptions {
    * @param category The root category name
    * @param message The root message
    */
-  public static void catchingReport(final Throwable throwable, final Logger logger,
-                                    final Class<?> source, final String category,
-                                    final String message) {
+  public static void catchingReport(final @NonNull Throwable throwable, @NonNull final Logger logger,
+                                    final @NonNull Class<?> source, final @NonNull String category,
+                                    final @NonNull String message) {
     final DetailedReport report = DetailedReport.create(message, throwable);
     report.category(category).detail("class", source);
 
@@ -95,10 +96,10 @@ public final class Exceptions {
    * @param message The root message
    * @param reportFiller The report filler function
    */
-  public static void catchingReport(final ThrowingRunnable<Throwable> throwingRunnable,
-                                    final Logger logger, final Class<?> source,
-                                    final String category, final String message,
-                                    final Consumer<DetailedReport> reportFiller) {
+  public static void catchingReport(final @NonNull ThrowingRunnable<Throwable> throwingRunnable,
+                                    final @NonNull Logger logger, final @NonNull Class<?> source,
+                                    final @NonNull String category, final @NonNull String message,
+                                    final @NonNull Consumer<DetailedReport> reportFiller) {
     try {
       throwingRunnable.throwingRun();
     } catch(final Throwable throwable) {
@@ -127,9 +128,9 @@ public final class Exceptions {
    * @param message The root message
    * @param reportFiller The report filler function
    */
-  public static void catchingReport(final Throwable throwable, final Logger logger,
-                                    final Class<?> source, final String category,
-                                    final String message, final Consumer<DetailedReport> reportFiller) {
+  public static void catchingReport(final @NonNull Throwable throwable, final @NonNull Logger logger,
+                                    final @NonNull Class<?> source, final @NonNull String category,
+                                    final @NonNull String message, final @NonNull Consumer<DetailedReport> reportFiller) {
     final DetailedReport report = DetailedReport.create(message, throwable);
     report.category(category).detail("class", source);
 
@@ -145,7 +146,7 @@ public final class Exceptions {
    * @param logger The logger
    * @param report The report
    */
-  public static void printReport(final Logger logger, final DetailedReport report) {
+  public static void printReport(final @NonNull Logger logger, final @NonNull DetailedReport report) {
     logger.error(String.format("%s:\n %s", report.message(), report.toString()));
   }
 }

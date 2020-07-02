@@ -27,6 +27,7 @@ package com.ichorpowered.protocolcontrol.service;
 import com.ichorpowered.protocolcontrol.ProtocolChannel;
 import com.ichorpowered.protocolcontrol.ProtocolEvent;
 import com.ichorpowered.protocolcontrol.packet.PacketRemapper;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
 public interface ProtocolService {
   /**
@@ -35,7 +36,7 @@ public interface ProtocolService {
    *
    * @return the protocol channels
    */
-  ProtocolChannel channels();
+  @NonNull ProtocolChannel channels();
 
   /**
    * Returns the {@link ProtocolEvent} providing methods to
@@ -43,7 +44,7 @@ public interface ProtocolService {
    *
    * @return the protocol events
    */
-  ProtocolEvent events();
+  @NonNull ProtocolEvent events();
 
   /**
    * Returns the {@link PacketRemapper} providing methods to
@@ -51,5 +52,5 @@ public interface ProtocolService {
    *
    * @return the packet remapper
    */
-  PacketRemapper remapper();
+  @NonNull PacketRemapper remapper();
 }
