@@ -84,7 +84,27 @@ public void onLoginEvent(PacketEvent<SPacketLoginSuccess> event) {
 The `PacketRemapper` is acquired from `ProtocolService#remapper`.
 
 ### Sending a Packet
-Work in Progress.
+You can send a new packet to the client or to the server using the `ChannelProfile#send` method. 
+
+```java
+@Listener
+public void onPlayerMove(final MoveEntityEvent event, final @First Player player) {
+  final Location<World> location = player.getLocation();
+  final ChannelProfile profile = this.protocolChannel.profile(player.getUniqueId());
+    
+  try {
+    final PacketRemapper.Wrapped<SPacketBlockChange> blockChange = this.remapper.wrap(new SPacketBlockChange());
+    blockChange.set(BlockPos.class, 0, new BlockPos(location.getBlockX(), location.getBlockY(), location.getBlockZ()));
+    blockChange.set(IBlockState.class, 0, (IBlockState) BlockTypes.WATER.getDefaultState());
+
+    profile.send(PacketDirection.OUTGOING, blockChange.packet()); // Sends the block change packet to the client.
+  } catch(Throwable throwable) {
+    throwable.printStackTrace();
+  }
+}
+```
+
+The `ProtocolChannel` is acquired from `ProtocolService#channels`. You can then grab the players `ChannelProfile` using `ProtocolChannel#profile`.
 
 [Gradle]: https://www.gradle.org/
 [Java]: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
