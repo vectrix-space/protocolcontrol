@@ -110,7 +110,7 @@ public final class PacketEvent<T extends Packet<?>> implements ReifiedEvent<T> {
     this.cancel = cancel;
   }
 
-  @SuppressWarnings("unchecked")
+  @SuppressWarnings({"unchecked", "UnstableApiUsage"})
   @Override
   public @NonNull TypeToken<T> type() {
     return (TypeToken<T>) TypeToken.of(this.packet.getClass());

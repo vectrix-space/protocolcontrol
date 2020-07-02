@@ -43,7 +43,6 @@ public final class ProtocolInjector {
   private final Game game;
   private final Logger logger;
   private final ChannelInitializer initializer;
-  private NetworkSystem networkSystem;
   private List<ChannelFuture> endpoints;
   private boolean setup = false;
   private boolean enabled = false;
@@ -57,17 +56,16 @@ public final class ProtocolInjector {
     this.initializer = initializer;
   }
 
-  @SuppressWarnings({"JavaReflectionMemberAccess", "unchecked"})
+  @SuppressWarnings({"unchecked", "JavaReflectionMemberAccess"})
   public void setup() {
     if(this.setup) return;
 
     try {
       final Field networkField = MinecraftServer.class.getDeclaredField("field_147144_o");
-      this.networkSystem = (NetworkSystem) networkField.get(this.game.getServer());
-
+      final NetworkSystem networkSystem = (NetworkSystem) networkField.get(this.game.getServer());
       final Field endpointsField = networkSystem.getClass().getDeclaredField("field_151274_e");
-      this.endpoints = (List<ChannelFuture>) endpointsField.get(networkSystem);
 
+      this.endpoints = (List<ChannelFuture>) endpointsField.get(networkSystem);
       this.setup = true;
     } catch(Throwable throwable) {
       Exceptions.catchingReport(

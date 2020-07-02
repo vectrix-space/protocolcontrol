@@ -111,19 +111,19 @@ public final class ChannelProfile {
    * @param direction the packet direction
    * @param packet the packet
    * @param currentThread whether to send on the current thread or
-   *                      or post to the event loop
+   *                      post to the event loop
    * @param <T> the packet type
    */
   public <T extends Packet<?>> void send(final PacketDirection direction, final T packet, final boolean currentThread) {
     if(direction == PacketDirection.INCOMING) {
-      final ChannelHandlerContext context = this.channel.pipeline().context(ProtocolInjector.OUTGOING_HANDLER);
+      final ChannelHandlerContext context = this.channel.pipeline().context(ProtocolInjector.INCOMING_HANDLER);
       if(currentThread) {
         this.read(context, packet);
       } else {
         this.channel.eventLoop().execute(() -> this.read(context, packet));
       }
     } else {
-      final ChannelHandlerContext context = this.channel.pipeline().context(ProtocolInjector.INCOMING_HANDLER);
+      final ChannelHandlerContext context = this.channel.pipeline().context(ProtocolInjector.OUTGOING_HANDLER);
       if(currentThread) {
         context.write(packet, this.channel.voidPromise());
       } else {
