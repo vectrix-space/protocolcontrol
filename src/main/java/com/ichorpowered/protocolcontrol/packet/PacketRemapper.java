@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 
@@ -122,7 +123,7 @@ public final class PacketRemapper {
      */
     @Nullable
     public <E> E get(final Class<E> type, final int index) throws Throwable {
-      final MethodHandle handle = this.structure.handle(type, index);
+      final MethodHandle handle = this.structure.getter(type, index);
       if (handle == null) throw new IllegalStateException("Unable to locate method handle");
 
       final Object field = handle.invoke(this.packet());
@@ -141,7 +142,7 @@ public final class PacketRemapper {
      * @throws Throwable exceptions attempting to locate the field
      */
     public <E> void set(final Class<E> type, final int index, final E value) throws Throwable {
-      final MethodHandle handle = this.structure.handle(type, index);
+      final MethodHandle handle = this.structure.setter(type, index);
       if (handle == null) throw new IllegalStateException("Unable to locate method handle");
 
       handle.invoke(this.packet(), value);
@@ -157,7 +158,7 @@ public final class PacketRemapper {
      *                   the field or the fields element
      */
     public int getInt(final int index) throws Throwable {
-      final MethodHandle handle = this.structure.handle(int.class, index);
+      final MethodHandle handle = this.structure.getter(int.class, index);
       if (handle == null) throw new IllegalStateException("Unable to locate method handle");
 
       final Object field = handle.invoke(this.packet());
@@ -173,7 +174,7 @@ public final class PacketRemapper {
      * @throws Throwable exceptions attempting to locate the field
      */
     public void setInt(final int index, final int value) throws Throwable {
-      final MethodHandle handle = this.structure.handle(int.class, index);
+      final MethodHandle handle = this.structure.setter(int.class, index);
       if (handle == null) throw new IllegalStateException("Unable to locate method handle");
 
       handle.invoke(this.packet(), value);
@@ -189,7 +190,7 @@ public final class PacketRemapper {
      *                   the field or the fields element
      */
     public double getDouble(final int index) throws Throwable {
-      final MethodHandle handle = this.structure.handle(double.class, index);
+      final MethodHandle handle = this.structure.getter(double.class, index);
       if (handle == null) throw new IllegalStateException("Unable to locate method handle");
 
       final Object field = handle.invoke(this.packet());
@@ -205,7 +206,7 @@ public final class PacketRemapper {
      * @throws Throwable exceptions attempting to locate the field
      */
     public void setDouble(final int index, final double value) throws Throwable {
-      final MethodHandle handle = this.structure.handle(double.class, index);
+      final MethodHandle handle = this.structure.setter(double.class, index);
       if (handle == null) throw new IllegalStateException("Unable to locate method handle");
 
       handle.invoke(this.packet(), value);
@@ -221,7 +222,7 @@ public final class PacketRemapper {
    */
   public static final class Structure<T> {
     public static <E> Structure<E> generate(final Logger logger, final MethodHandles.Lookup lookup, final Class<E> packet) {
-      final Map<Class<?>, List<MethodHandle>> handleMap = Maps.newHashMap();
+      final Map<Class<?>, List<Handle>> handleMap = Maps.newHashMap();
 
       // Search function to grab fields from the packet class and other super classes.
       Structure.find(packet, Class::getSuperclass, fields -> {
@@ -230,8 +231,8 @@ public final class PacketRemapper {
             final Field field = fields[i];
             field.setAccessible(true);
 
-            final List<MethodHandle> methodHandles = handleMap.computeIfAbsent(field.getType(), key -> new ArrayList<>());
-            methodHandles.add(lookup.unreflectGetter(field));
+            final List<Handle> methodHandles = handleMap.computeIfAbsent(field.getType(), key -> new ArrayList<>());
+            methodHandles.add(new Handle(lookup.unreflectGetter(field), lookup.unreflectSetter(field)));
           } catch (IllegalAccessException e) {
             logger.error("Unable to access packet structure field", e);
           }
@@ -252,10 +253,10 @@ public final class PacketRemapper {
     }
 
     private final Class<T> packet;
-    private final Map<Class<?>, List<MethodHandle>> handles;
+    private final Map<Class<?>, List<Handle>> handles;
 
     public Structure(final Class<T> packet,
-                     final Map<Class<?>, List<MethodHandle>> handles) {
+                     final Map<Class<?>, List<Handle>> handles) {
       this.packet = packet;
       this.handles = handles;
     }
@@ -265,10 +266,37 @@ public final class PacketRemapper {
     }
 
     @Nullable
-    public MethodHandle handle(final Class<?> type, final int index) {
-      final List<MethodHandle> handles = this.handles.get(type);
+    public MethodHandle getter(final Class<?> type, final int index) {
+      final List<Handle> handles = this.handles.get(type);
       if (handles == null || index < 0 || index >= handles.size()) return null;
-      return handles.get(index);
+      return handles.get(index).getter();
+    }
+
+    @Nullable
+    public MethodHandle setter(final Class<?> type, final int index) {
+      final List<Handle> handles = this.handles.get(type);
+      if (handles == null || index < 0 || index >= handles.size()) return null;
+      return handles.get(index).setter();
+    }
+  }
+
+  public static final class Handle {
+    private final MethodHandle getter;
+    private final MethodHandle setter;
+
+    public Handle(final @NonNull MethodHandle getter, final @NonNull MethodHandle setter) {
+      this.getter = getter;
+      this.setter = setter;
+    }
+
+    @NonNull
+    public MethodHandle getter() {
+      return this.getter;
+    }
+
+    @NonNull
+    public MethodHandle setter() {
+      return this.setter;
     }
   }
 }
