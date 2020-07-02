@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-  compile "com.ichorpowered:protocolcontrol:0.0.1-SNAPSHOT"
+  compile "com.ichorpowered:protocolcontrol:0.0.1"
 }
 ```
 
