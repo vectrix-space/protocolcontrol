@@ -80,57 +80,61 @@ public final class PacketHandler extends ChannelDuplexHandler {
 
   @Override
   public void channelActive(final ChannelHandlerContext context) throws Exception {
-    try {
-      if(!this.injected) {
-        final Incoming incoming = new Incoming(this);
-        final Outgoing outgoing = new Outgoing(this);
+    Exceptions.catchingReport(
+      () -> {
+        if(!this.injected) {
+          final Incoming incoming = new Incoming(this);
+          final Outgoing outgoing = new Outgoing(this);
 
-        context.pipeline().remove(this).addBefore("packet_handler", "protocolcontrol_listener", this);
-        context.pipeline().addAfter("decoder", ProtocolInjector.INCOMING_HANDLER, incoming);
-        context.pipeline().addAfter("packet_handler", ProtocolInjector.OUTGOING_HANDLER, outgoing);
+          context.pipeline().remove(this).addBefore("packet_handler", "protocolcontrol_listener", this);
+          context.pipeline().addAfter("decoder", ProtocolInjector.INCOMING_HANDLER, incoming);
+          context.pipeline().addAfter("packet_handler", ProtocolInjector.OUTGOING_HANDLER, outgoing);
 
-        this.remapper.structure(SPacketLoginSuccess.class); // Prepare the structure early.
+          this.remapper.structure(SPacketLoginSuccess.class); // Prepare the structure early.
 
-        this.profile.active(true);
+          this.profile.active(true);
 
-        this.injected = true;
-      }
-    } catch(Throwable throwable) {
-      Exceptions.catchingReport(
-        throwable,
-        this.logger,
-        PacketHandler.class,
-        "packet",
-        "Encountered a major exception attempting to handle channel active"
-      );
-    }
+          this.injected = true;
+        }
+      },
+      this.logger,
+      PacketHandler.class,
+      "channel",
+      "Encountered a major exception attempting to handle channel active",
+      report -> report.category("channel_active")
+        .detail("profile", this.profile)
+        .detail("context", context.name())
+    );
 
     super.channelActive(context);
   }
 
   @Override
   public void write(final ChannelHandlerContext context, final Object message, final ChannelPromise promise) throws Exception {
-    try {
-      if(message instanceof SPacketLoginSuccess) {
-        final PacketRemapper.Wrapped<SPacketLoginSuccess> wrapped = this.remapper.wrap((SPacketLoginSuccess) message);
-        final GameProfile profile = wrapped.get(GameProfile.class, 0);
+    Exceptions.catchingReport(
+      () -> {
+        if(message instanceof SPacketLoginSuccess) {
+          final PacketRemapper.Wrapped<SPacketLoginSuccess> wrapped = this.remapper.wrap((SPacketLoginSuccess) message);
+          final GameProfile profile = wrapped.get(GameProfile.class, 0);
 
-        if(profile != null) {
-          this.profile.player(profile.getId());
-          this.channels.add(this.profile);
-        } else {
-          this.logger.warn("Failed to acquire player on login for a connected channel.");
+          if(profile != null) {
+            this.profile.player(profile.getId());
+            this.channels.add(this.profile);
+          } else {
+            this.logger.warn("Failed to acquire player on login for a connected channel.");
+          }
         }
-      }
-    } catch(Throwable throwable) {
-      Exceptions.catchingReport(
-        throwable,
-        this.logger,
-        PacketHandler.class,
-        "packet",
-        "Encountered a major exception attempting to handle channel write"
-      );
-    }
+      },
+      this.logger,
+      PacketHandler.class,
+      "packet",
+      "Encountered a major exception attempting to handle channel write",
+      report -> report.category("packet_write")
+        .detail("profile", this.profile)
+        .detail("player", this.profile.player())
+        .detail("context", context.name())
+        .detail("message", message)
+    );
 
     super.write(context, message, promise);
   }
@@ -155,14 +159,15 @@ public final class PacketHandler extends ChannelDuplexHandler {
     }
 
     @Override
-    public void channelRead(final ChannelHandlerContext context, Object message) throws Exception {
+    public void channelRead(final ChannelHandlerContext context, final Object message) throws Exception {
+      Object transformedMessage = message;
       try {
-        if(message instanceof Packet) {
-          final PacketEvent<?> packetEvent = new PacketEvent<>(this.handler.profile(), PacketDirection.INCOMING, (Packet<?>) message);
+        if(transformedMessage instanceof Packet) {
+          final PacketEvent<?> packetEvent = new PacketEvent<>(this.handler.profile(), PacketDirection.INCOMING, (Packet<?>) transformedMessage);
           this.handler.event().fire(packetEvent).get();
 
           if(packetEvent.cancel()) return;
-          message = packetEvent.packet();
+          transformedMessage = packetEvent.packet();
         }
       } catch(Throwable throwable) {
         Exceptions.catchingReport(
@@ -170,11 +175,16 @@ public final class PacketHandler extends ChannelDuplexHandler {
           this.handler.logger(),
           PacketHandler.class,
           "packet",
-          "Encountered a minor exception attempting to handle an incoming packet"
+          "Encountered a minor exception attempting to handle an incoming packet",
+          report -> report.category("packet_write")
+            .detail("profile", this.handler.profile())
+            .detail("player", this.handler.profile().player())
+            .detail("context", context.name())
+            .detail("message", message)
         );
       }
 
-      super.channelRead(context, message);
+      super.channelRead(context, transformedMessage);
     }
   }
 
@@ -186,14 +196,15 @@ public final class PacketHandler extends ChannelDuplexHandler {
     }
 
     @Override
-    public void write(final ChannelHandlerContext context, Object message, final ChannelPromise promise) throws Exception {
+    public void write(final ChannelHandlerContext context, final Object message, final ChannelPromise promise) throws Exception {
+      Object transformedMessage = message;
       try {
-        if(message instanceof Packet) {
-          final PacketEvent<?> packetEvent = new PacketEvent<>(this.handler.profile(), PacketDirection.OUTGOING, (Packet<?>) message);
+        if(transformedMessage instanceof Packet) {
+          final PacketEvent<?> packetEvent = new PacketEvent<>(this.handler.profile(), PacketDirection.OUTGOING, (Packet<?>) transformedMessage);
           this.handler.event().fire(packetEvent).get();
 
           if(packetEvent.cancel()) return;
-          message = packetEvent.packet();
+          transformedMessage = packetEvent.packet();
         }
       } catch(Throwable throwable) {
         Exceptions.catchingReport(
@@ -201,11 +212,16 @@ public final class PacketHandler extends ChannelDuplexHandler {
           this.handler.logger(),
           PacketHandler.class,
           "packet",
-          "Encountered a minor exception attempting to handle an outgoing packet"
+          "Encountered a minor exception attempting to handle an outgoing packet",
+          report -> report.category("packet_write")
+            .detail("profile", this.handler.profile())
+            .detail("player", this.handler.profile().player())
+            .detail("context", context.name())
+            .detail("message", message)
         );
       }
 
-      super.write(context, message, promise);
+      super.write(context, transformedMessage, promise);
     }
   }
 }

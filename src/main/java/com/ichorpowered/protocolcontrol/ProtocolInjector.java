@@ -60,62 +60,56 @@ public final class ProtocolInjector {
   public void setup() {
     if(this.setup) return;
 
-    try {
-      final Field networkField = MinecraftServer.class.getDeclaredField("field_147144_o");
-      final NetworkSystem networkSystem = (NetworkSystem) networkField.get(this.game.getServer());
-      final Field endpointsField = networkSystem.getClass().getDeclaredField("field_151274_e");
+    Exceptions.catchingReport(
+      () -> {
+        final Field networkField = MinecraftServer.class.getDeclaredField("field_147144_o");
+        final NetworkSystem networkSystem = (NetworkSystem) networkField.get(this.game.getServer());
+        final Field endpointsField = networkSystem.getClass().getDeclaredField("field_151274_e");
 
-      this.endpoints = (List<ChannelFuture>) endpointsField.get(networkSystem);
-      this.setup = true;
-    } catch(Throwable throwable) {
-      Exceptions.catchingReport(
-        throwable,
-        this.logger,
-        ProtocolInjector.class,
-        "injector_setup",
-        "Encountered a major exception attempting to setup channel injector"
-      );
-    }
+        this.endpoints = (List<ChannelFuture>) endpointsField.get(networkSystem);
+        this.setup = true;
+      },
+      this.logger,
+      ProtocolInjector.class,
+      "injector",
+      "Encountered a major exception attempting to setup channel injector"
+    );
   }
 
   public void enable() {
     if(this.enabled || !this.setup) return;
 
-    try {
-      for(final ChannelFuture future : this.endpoints) {
-        future.channel().pipeline().addFirst(this.initializer);
-      }
+    Exceptions.catchingReport(
+      () -> {
+        for(final ChannelFuture future : this.endpoints) {
+          future.channel().pipeline().addFirst(this.initializer);
+        }
 
-      this.enabled = true;
-    } catch(Throwable throwable) {
-      Exceptions.catchingReport(
-        throwable,
-        this.logger,
-        ProtocolInjector.class,
-        "injector",
-        "Encountered a major exception attempting to enable channel injector"
-      );
-    }
+        this.enabled = true;
+      },
+      this.logger,
+      ProtocolInjector.class,
+      "injector",
+      "Encountered a major exception attempting to enable channel injector"
+    );
   }
 
   public void disable() {
     if(!this.enabled || !this.setup) return;
 
-    try {
-      for(final ChannelFuture future : this.endpoints) {
-        future.channel().pipeline().remove(this.initializer);
-      }
+    Exceptions.catchingReport(
+      () -> {
+        for(final ChannelFuture future : this.endpoints) {
+          future.channel().pipeline().remove(this.initializer);
+        }
 
-      this.enabled = false;
-    } catch(Throwable throwable) {
-      Exceptions.catchingReport(
-        throwable,
-        this.logger,
-        ProtocolInjector.class,
-        "injector",
-        "Encountered a major exception attempting to disable channel injector"
-      );
-    }
+        this.enabled = false;
+      },
+      this.logger,
+      ProtocolInjector.class,
+      "injector",
+      "Encountered a major exception attempting to disable channel injector"
+    );
   }
 
   public boolean enabled() {

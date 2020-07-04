@@ -59,21 +59,21 @@ public final class ChannelInitializer extends ChannelInboundHandlerAdapter {
 
   @Override
   public void channelRead(final ChannelHandlerContext context, final Object message) throws Exception {
-    try {
-      final Channel channel = (Channel) message;
-      final ChannelProfile profile = this.profileFactory.create(channel);
-      final PacketHandler handler = new PacketHandler(this.logger, this.channels, this.events, this.remapper, profile);
+    Exceptions.catchingReport(
+      () -> {
+        final Channel channel = (Channel) message;
+        final ChannelProfile profile = this.profileFactory.create(channel);
+        final PacketHandler handler = new PacketHandler(this.logger, this.channels, this.events, this.remapper, profile);
 
-      channel.pipeline().addLast(handler);
-    } catch(Throwable throwable) {
-      Exceptions.catchingReport(
-        throwable,
-        this.logger,
-        ChannelInitializer.class,
-        "channel",
-        "Encountered a major exception attempting to initialize a channel"
-      );
-    }
+        channel.pipeline().addLast(handler);
+      },
+      this.logger,
+      ChannelInitializer.class,
+      "channel",
+      "Encountered a major exception attempting to initialize a channel",
+      report -> report.category("channel_read")
+        .detail("context", context.name())
+    );
 
     super.channelRead(context, message);
   }
