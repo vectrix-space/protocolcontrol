@@ -36,7 +36,5 @@ jobs:
         env:
           GITHUB_USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ICHORPOWERED_SNAPSHOT_REPO: ${{ secrets.ICHORPOWERED_SNAPSHOT_REPO }}
-          ICHORPOWERED_RELEASE_REPO: ${{ secrets.ICHORPOWERED_RELEASE_REPO }}
           ICHORPOWERED_USERNAME: ${{ secrets.ICHORPOWERED_USERNAME }}
           ICHORPOWERED_PASSWORD: ${{ secrets.ICHORPOWERED_PASSWORD }}

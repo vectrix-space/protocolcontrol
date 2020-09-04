@@ -129,13 +129,13 @@ artifacts {
   archives shadowJar
 }
 
-def ichorpoweredSnapshotRepo = System.getenv("ICHORPOWERED_SNAPSHOT_REPO")
-def ichorpoweredReleaseRepo = System.getenv("ICHORPOWERED_RELEASE_REPO")
+def ichorpoweredUsername = System.getenv("ICHORPOWERED_USERNAME")
+def ichorpoweredPassword = System.getenv("ICHORPOWERED_PASSWORD")
 
 tasks.<PublishToMavenRepository>withType(PublishToMavenRepository.class).configureEach {
   onlyIf {
     (repository == publishing.repositories["GitHubPackages"]
-      || (ichorpoweredSnapshotRepo != null && ichorpoweredReleaseRepo != null))
+      || (ichorpoweredUsername != null && ichorpoweredPassword != null))
   }
 }
 
@@ -151,11 +151,11 @@ publishing {
     }
     maven {
       name = "IchorpoweredRepo"
-      url = ((version as String).endsWith("-SNAPSHOT")) ? ichorpoweredSnapshotRepo : ichorpoweredReleaseRepo
+      url = "https://repo.ichorpowered.com/repository/maven-ichorpowered"
 
       credentials {
-        username = System.getenv("ICHORPOWERED_USERNAME")
-        password = System.getenv("ICHORPOWERED_PASSWORD")
+        username = ichorpoweredUsername
+        password = ichorpoweredPassword
       }
     }
   }
