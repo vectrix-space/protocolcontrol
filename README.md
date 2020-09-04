@@ -18,11 +18,11 @@ Using `ProtocolControl` in your plugin requires you to use ForgeGradle and add `
 
 ```gradle
 repositories {
-  maven { url "https://maven.pkg.github.com/ichorpowered/protocolcontrol" }
+  maven { url "https://repo.ichorpowered.com/repository/maven-public" }
 }
 
 dependencies {
-  compile "com.ichorpowered:protocolcontrol:0.0.1"
+  compile "com.ichorpowered:protocolcontrol:0.0.2-SNAPSHOT"
 }
 ```
 
