@@ -161,6 +161,9 @@ publishing {
   }
   publications {
     mavenJava(MavenPublication) {
+      artifactId = 'protocolcontrol'
+      from components.java
+
       pom {
         name = "protocolcontrol"
         description = "A minimal packet manipulation library for Sponge."
