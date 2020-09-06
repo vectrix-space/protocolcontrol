@@ -87,7 +87,7 @@ public final class PacketRemapper {
   }
 
   /**
-   * An wrapper containing the {@code T} packet and the specific
+   * A wrapper containing the {@code T} packet and the specific
    * {@link Structure} this packet uses.
    *
    * @param <T> the packet type

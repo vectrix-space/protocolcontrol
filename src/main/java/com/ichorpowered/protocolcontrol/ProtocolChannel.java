@@ -24,7 +24,7 @@
  */
 package com.ichorpowered.protocolcontrol;
 
-import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
 import com.google.inject.Singleton;
 import com.ichorpowered.protocolcontrol.channel.ChannelProfile;
 import java.util.UUID;
@@ -39,7 +39,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Singleton
 public final class ProtocolChannel {
-  private final ConcurrentMap<UUID, ChannelProfile> channels = new MapMaker().initialCapacity(1).weakValues().makeMap();
+  private final ConcurrentMap<UUID, ChannelProfile> channels = Maps.newConcurrentMap();
   private boolean enabled = false;
 
   protected void enable() {
