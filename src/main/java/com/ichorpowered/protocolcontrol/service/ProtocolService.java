@@ -29,6 +29,11 @@ import com.ichorpowered.protocolcontrol.ProtocolEvent;
 import com.ichorpowered.protocolcontrol.packet.PacketRemapper;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
+/**
+ * A service providing a plugin access to the {@link ProtocolChannel},
+ * {@link ProtocolEvent} and {@link PacketRemapper}, for manipulating
+ * packets.
+ */
 public interface ProtocolService {
   /**
    * Returns the {@link ProtocolChannel} providing methods to

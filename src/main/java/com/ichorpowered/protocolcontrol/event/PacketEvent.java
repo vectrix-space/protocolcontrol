@@ -24,9 +24,9 @@
  */
 package com.ichorpowered.protocolcontrol.event;
 
+import com.google.common.reflect.TypeToken;
 import com.ichorpowered.protocolcontrol.channel.ChannelProfile;
 import com.ichorpowered.protocolcontrol.packet.PacketDirection;
-import com.google.common.reflect.TypeToken;
 import net.kyori.event.ReifiedEvent;
 import net.minecraft.network.Packet;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -34,12 +34,8 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
- * An immutable event containing the {@code T} packet, the
- * {@link PacketDirection} and the {@link ChannelProfile} which
- * it applies to.
- *
- * <p>Instances of this must be manually recycled, this should
- * be done after using the particular packet.</p>
+ * An event containing the {@code T} packet, the {@link PacketDirection}
+ * and the {@link ChannelProfile} which it applies to.
  *
  * @param <T> the packet type
  */

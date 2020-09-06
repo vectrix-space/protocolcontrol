@@ -25,9 +25,9 @@
 package com.ichorpowered.protocolcontrol.packet;
 
 import com.ichorpowered.protocolcontrol.ProtocolChannel;
+import com.ichorpowered.protocolcontrol.ProtocolEvent;
 import com.ichorpowered.protocolcontrol.ProtocolInjector;
 import com.ichorpowered.protocolcontrol.channel.ChannelProfile;
-import com.ichorpowered.protocolcontrol.ProtocolEvent;
 import com.ichorpowered.protocolcontrol.event.PacketEvent;
 import com.ichorpowered.protocolcontrol.util.Exceptions;
 import com.mojang.authlib.GameProfile;
@@ -141,12 +141,23 @@ public final class PacketHandler extends ChannelDuplexHandler {
 
   @Override
   public void channelInactive(final ChannelHandlerContext context) throws Exception {
-    if(this.injected) {
-      final UUID player = this.profile.player();
-      if(player != null) this.channels.clear(player);
+    Exceptions.catchingReport(
+      () -> {
+        if(this.injected) {
+          final UUID player = this.profile.player();
+          if(player != null) this.channels.remove(player);
 
-      this.profile.active(false);
-    }
+          this.profile.active(false);
+        }
+      },
+      this.logger,
+      PacketHandler.class,
+      "channel",
+      "Encountered a major exception attempting to handle channel inactive",
+      report -> report.category("channel_inactive")
+        .detail("profile", this.profile)
+        .detail("context", context.name())
+    );
 
     super.channelInactive(context);
   }
@@ -176,7 +187,7 @@ public final class PacketHandler extends ChannelDuplexHandler {
           PacketHandler.class,
           "packet",
           "Encountered a minor exception attempting to handle an incoming packet",
-          report -> report.category("packet_write")
+          report -> report.category("packet_read")
             .detail("profile", this.handler.profile())
             .detail("player", this.handler.profile().player())
             .detail("context", context.name())

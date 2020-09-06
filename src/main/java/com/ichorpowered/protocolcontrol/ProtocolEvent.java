@@ -24,12 +24,11 @@
  */
 package com.ichorpowered.protocolcontrol;
 
-import com.ichorpowered.protocolcontrol.event.PacketEvent;
-import com.ichorpowered.protocolcontrol.packet.PacketHandler;
-import com.ichorpowered.protocolcontrol.util.Exceptions;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.ichorpowered.protocolcontrol.event.PacketEvent;
+import com.ichorpowered.protocolcontrol.util.Exceptions;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -45,6 +44,9 @@ import org.slf4j.Logger;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * An event manager for sending and listening to {@link PacketEvent}s.
+ */
 @Singleton
 public final class ProtocolEvent {
   private final Logger logger;
@@ -58,7 +60,7 @@ public final class ProtocolEvent {
     this.logger = logger;
   }
 
-  public void enable() {
+  protected void enable() {
     if(this.enabled) return;
 
     this.service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactoryBuilder()
@@ -71,7 +73,7 @@ public final class ProtocolEvent {
     this.enabled = true;
   }
 
-  public void disable() {
+  protected void disable() {
     if(!this.enabled) return;
 
     this.bus.unregisterAll();
@@ -144,8 +146,8 @@ public final class ProtocolEvent {
       Exceptions.catchingReport(
         throwable,
         this.logger,
-        PacketHandler.class,
-        "network",
+        PacketEvent.class,
+        "event",
         "Encountered a minor exception attempting to post a packet event"
       );
     }

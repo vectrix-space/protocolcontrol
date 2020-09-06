@@ -24,11 +24,11 @@
  */
 package com.ichorpowered.protocolcontrol.service;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.ichorpowered.protocolcontrol.ProtocolChannel;
 import com.ichorpowered.protocolcontrol.ProtocolEvent;
 import com.ichorpowered.protocolcontrol.packet.PacketRemapper;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 @Singleton

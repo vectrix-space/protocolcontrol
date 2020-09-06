@@ -24,9 +24,9 @@
  */
 package com.ichorpowered.protocolcontrol;
 
-import com.ichorpowered.protocolcontrol.service.ProtocolService;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.ichorpowered.protocolcontrol.service.ProtocolService;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;

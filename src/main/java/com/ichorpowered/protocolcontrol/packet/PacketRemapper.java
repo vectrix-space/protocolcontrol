@@ -27,6 +27,7 @@ package com.ichorpowered.protocolcontrol.packet;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.ichorpowered.protocolcontrol.util.Exceptions;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -86,11 +87,8 @@ public final class PacketRemapper {
   }
 
   /**
-   * An immutable wrapper containing the {@code T} packet and
-   * the specific {@link Structure} this packet uses.
-   *
-   * <p>Instances of this must be manually recycled, this should
-   * be done after using the particular packet.</p>
+   * An wrapper containing the {@code T} packet and the specific
+   * {@link Structure} this packet uses.
    *
    * @param <T> the packet type
    */
@@ -229,15 +227,23 @@ public final class PacketRemapper {
 
       // Search function to grab fields from the packet class and other super classes.
       Structure.find(packet, Class::getSuperclass, fields -> {
-        for(int i = 0; i < fields.length; i++) {
+        for(final Field field : fields) {
           try {
-            final Field field = fields[i];
             field.setAccessible(true);
 
             final List<Handle> methodHandles = handleMap.computeIfAbsent(field.getType(), key -> new ArrayList<>());
             methodHandles.add(new Handle(lookup.unreflectGetter(field), lookup.unreflectSetter(field)));
-          } catch(IllegalAccessException e) {
-            logger.error("Unable to access packet structure field", e);
+          } catch(Throwable throwable) {
+            Exceptions.catchingReport(
+              throwable,
+              logger,
+              PacketRemapper.class,
+              "remapper",
+              "Encountered a major exception attempting to access packet field",
+              report -> report.category("structure_generate")
+                .detail("packet", packet)
+                .detail("field", field.getName())
+            );
           }
         }
       });

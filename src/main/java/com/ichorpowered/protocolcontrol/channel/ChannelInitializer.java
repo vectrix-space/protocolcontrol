@@ -24,13 +24,13 @@
  */
 package com.ichorpowered.protocolcontrol.channel;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.ichorpowered.protocolcontrol.ProtocolChannel;
 import com.ichorpowered.protocolcontrol.ProtocolEvent;
 import com.ichorpowered.protocolcontrol.packet.PacketHandler;
 import com.ichorpowered.protocolcontrol.packet.PacketRemapper;
 import com.ichorpowered.protocolcontrol.util.Exceptions;
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

@@ -24,7 +24,19 @@
  */
 package com.ichorpowered.protocolcontrol.packet;
 
+/**
+ * Represents the direction a packet is traveling.
+ */
 public enum PacketDirection {
+  /**
+   * The direction for when a packet is to be sent from the
+   * client to the server.
+   */
   INCOMING,
+
+  /**
+   * The direction for when a packet is to be sent from the
+   * server to the client.
+   */
   OUTGOING
 }

@@ -24,8 +24,8 @@
  */
 package com.ichorpowered.protocolcontrol;
 
-import com.ichorpowered.protocolcontrol.channel.ChannelProfile;
 import com.ichorpowered.protocolcontrol.channel.ChannelInitializer;
+import com.ichorpowered.protocolcontrol.channel.ChannelProfile;
 import com.ichorpowered.protocolcontrol.packet.PacketRemapper;
 import com.ichorpowered.protocolcontrol.service.ProtocolService;
 import com.ichorpowered.protocolcontrol.service.SimpleProtocolService;
@@ -34,18 +34,11 @@ import net.kyori.violet.AbstractModule;
 public final class ProtocolModule extends AbstractModule {
   @Override
   protected void configure() {
-    // Core
     this.bind(ChannelInitializer.class);
-    this.bind(ProtocolEvent.class);
-
-    // Channel
-    this.bind(ProtocolInjector.class);
-    this.installFactory(ChannelProfile.Factory.class);
-
-    // Packet
     this.bind(PacketRemapper.class);
-
-    // Service
+    this.bind(ProtocolEvent.class);
+    this.bind(ProtocolInjector.class);
     this.bind(ProtocolService.class).to(SimpleProtocolService.class);
+    this.installFactory(ChannelProfile.Factory.class);
   }
 }

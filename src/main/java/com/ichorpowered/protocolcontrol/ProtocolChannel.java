@@ -34,17 +34,20 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * A channel manager for managing active channels.
+ */
 @Singleton
 public final class ProtocolChannel {
   private final ConcurrentMap<UUID, ChannelProfile> channels = new MapMaker().initialCapacity(1).weakValues().makeMap();
   private boolean enabled = false;
 
-  public void enable() {
+  protected void enable() {
     if(this.enabled) return;
     this.enabled = true;
   }
 
-  public void disable() {
+  protected void disable() {
     if(!this.enabled) return;
     this.enabled = false;
 
@@ -81,7 +84,7 @@ public final class ProtocolChannel {
    *
    * @param player the player
    */
-  public void clear(final @NonNull UUID player) {
+  public void remove(final @NonNull UUID player) {
     this.channels.remove(requireNonNull(player, "player"));
   }
 

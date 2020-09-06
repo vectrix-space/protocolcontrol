@@ -24,10 +24,10 @@
  */
 package com.ichorpowered.protocolcontrol;
 
-import com.ichorpowered.protocolcontrol.channel.ChannelInitializer;
-import com.ichorpowered.protocolcontrol.util.Exceptions;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.ichorpowered.protocolcontrol.channel.ChannelInitializer;
+import com.ichorpowered.protocolcontrol.util.Exceptions;
 import io.netty.channel.ChannelFuture;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -57,7 +57,7 @@ public final class ProtocolInjector {
   }
 
   @SuppressWarnings({"unchecked", "JavaReflectionMemberAccess"})
-  public void setup() {
+  protected void setup() {
     if(this.setup) return;
 
     Exceptions.catchingReport(
@@ -76,7 +76,7 @@ public final class ProtocolInjector {
     );
   }
 
-  public void enable() {
+  protected void enable() {
     if(this.enabled || !this.setup) return;
 
     Exceptions.catchingReport(
@@ -94,8 +94,8 @@ public final class ProtocolInjector {
     );
   }
 
-  public void disable() {
-    if(!this.enabled || !this.setup) return;
+  protected void disable() {
+    if(!this.enabled) return;
 
     Exceptions.catchingReport(
       () -> {
