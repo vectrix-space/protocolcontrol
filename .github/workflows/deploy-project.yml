@@ -32,7 +32,7 @@ jobs:
       # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
       # the publishing section of your build.gradle
       - name: Publish to GitHub Packages
-        run: ./gradlew javadocJar sourceJar shadowJar publish
+        run: ./gradlew javadocsJar sourcesJar shadowJar publish
         env:
           GITHUB_USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

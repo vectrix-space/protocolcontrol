@@ -16,7 +16,7 @@ plugins {
   id "com.github.johnrengelman.shadow" version "5.2.0"
   id "org.spongepowered.plugin" version "0.9.0"
   id "net.minecrell.vanillagradle.server" version "2.2-6"
-  id "java"
+  id "java-library"
   id "maven-publish"
 }
 
@@ -96,9 +96,14 @@ javadoc {
   options.addStringOption("Xdoclint:none", "-quiet")
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
+task sourcesJar(type: Jar) {
+  from sourceSets.main.allJava
+  classifier = 'sources'
+}
+
+task javadocsJar(type: Jar) {
+  from javadoc
   classifier = "javadoc"
-  from javadoc.destinationDir
 }
 
 shadowJar {
@@ -121,12 +126,6 @@ shadowJar {
   relocate("net.kyori", "com.ichorpowered.protocolcontrol.lib.kyori")
 
   exclude "dummyThing"
-}
-
-artifacts {
-  archives sourceJar
-  archives javadocJar
-  archives shadowJar
 }
 
 def ichorpoweredUsername = System.getenv("ICHORPOWERED_USERNAME")
@@ -163,10 +162,14 @@ publishing {
     mavenJava(MavenPublication) {
       artifactId = 'protocolcontrol'
       from components.java
+      artifact shadowJar
+      artifact sourcesJar
+      artifact javadocsJar
 
       pom {
         name = "protocolcontrol"
         description = "A minimal packet manipulation library for Sponge."
+        url = "https://github.com/ichorpowered/protocolcontrol"
 
         licenses {
           license {
