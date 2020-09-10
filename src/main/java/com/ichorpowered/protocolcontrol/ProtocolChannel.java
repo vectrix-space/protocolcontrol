@@ -50,10 +50,14 @@ public final class ProtocolChannel {
   protected void disable() {
     if(!this.enabled) return;
     this.enabled = false;
-
     this.channels.clear();
   }
 
+  /**
+   * Returns whether {@link ProtocolChannel} is enabled.
+   *
+   * @return whether channels are enabled
+   */
   public boolean enabled() {
     return this.enabled;
   }

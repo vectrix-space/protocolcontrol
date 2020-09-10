@@ -65,15 +65,12 @@ public final class ProtocolPlugin {
   @Listener(order = Order.FIRST)
   public void onGameInitialization(final GameInitializationEvent event) {
     final Injector childInjector = this.injector.createChildInjector(new ProtocolModule());
-
     this.protocolChannel = childInjector.getInstance(ProtocolChannel.class);
     this.protocolEvent = childInjector.getInstance(ProtocolEvent.class);
     this.protocolInjector = childInjector.getInstance(ProtocolInjector.class);
-
     this.protocolInjector.setup();
     this.protocolChannel.enable();
     this.protocolEvent.enable();
-
     final ProtocolService protocolService = childInjector.getInstance(ProtocolService.class);
     Sponge.getServiceManager().setProvider(this, ProtocolService.class, protocolService);
   }
@@ -81,7 +78,6 @@ public final class ProtocolPlugin {
   @Listener(order = Order.FIRST)
   public void onGameStarting(final GamePostInitializationEvent event) {
     this.protocolInjector.enable();
-
     this.logger.info("Successfully injected " + this.plugin.getName() + " version " + this.plugin.getVersion().orElse("UNKNOWN"));
   }
 
@@ -90,7 +86,6 @@ public final class ProtocolPlugin {
     if(this.protocolInjector != null && this.protocolInjector.enabled()) this.protocolInjector.disable();
     if(this.protocolEvent != null && this.protocolEvent.enabled()) this.protocolEvent.disable();
     if(this.protocolChannel != null && this.protocolChannel.enabled()) this.protocolChannel.disable();
-
     this.logger.info("Stopped " + this.plugin.getName());
   }
 }

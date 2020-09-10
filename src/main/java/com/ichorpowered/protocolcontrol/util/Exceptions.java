@@ -77,7 +77,6 @@ public final class Exceptions {
                                     final @NonNull String message) {
     final DetailedReport report = DetailedReport.create(message, throwable);
     report.category(category).detail("class", source);
-
     Exceptions.printReport(logger, report);
   }
 
@@ -133,9 +132,7 @@ public final class Exceptions {
                                     final @NonNull String message, final @NonNull Consumer<DetailedReport> reportFiller) {
     final DetailedReport report = DetailedReport.create(message, throwable);
     report.category(category).detail("class", source);
-
     reportFiller.accept(report);
-
     Exceptions.printReport(logger, report);
   }
 

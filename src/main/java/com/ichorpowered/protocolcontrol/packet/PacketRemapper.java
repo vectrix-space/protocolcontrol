@@ -125,7 +125,6 @@ public final class PacketRemapper {
     public <E> @Nullable E get(final @NonNull Class<E> type, final int index) throws Throwable {
       final MethodHandle handle = this.structure.getter(requireNonNull(type, "type"), index);
       if(handle == null) throw new IllegalStateException("Unable to locate method handle");
-
       final Object field = handle.invoke(this.packet());
       return field != null ? type.cast(field) : null;
     }
@@ -144,7 +143,6 @@ public final class PacketRemapper {
     public <E> void set(final @NonNull Class<E> type, final int index, final @Nullable E value) throws Throwable {
       final MethodHandle handle = this.structure.setter(requireNonNull(type, "type"), index);
       if(handle == null) throw new IllegalStateException("Unable to locate method handle");
-
       handle.invoke(this.packet(), value);
     }
 
@@ -160,7 +158,6 @@ public final class PacketRemapper {
     public int getInt(final int index) throws Throwable {
       final MethodHandle handle = this.structure.getter(int.class, index);
       if(handle == null) throw new IllegalStateException("Unable to locate method handle");
-
       final Object field = handle.invoke(this.packet());
       return field != null ? (int) field : 0;
     }
@@ -176,7 +173,6 @@ public final class PacketRemapper {
     public void setInt(final int index, final int value) throws Throwable {
       final MethodHandle handle = this.structure.setter(int.class, index);
       if(handle == null) throw new IllegalStateException("Unable to locate method handle");
-
       handle.invoke(this.packet(), value);
     }
 
@@ -192,7 +188,6 @@ public final class PacketRemapper {
     public double getDouble(final int index) throws Throwable {
       final MethodHandle handle = this.structure.getter(double.class, index);
       if(handle == null) throw new IllegalStateException("Unable to locate method handle");
-
       final Object field = handle.invoke(this.packet());
       return field != null ? (double) field : 0D;
     }
@@ -208,7 +203,6 @@ public final class PacketRemapper {
     public void setDouble(final int index, final double value) throws Throwable {
       final MethodHandle handle = this.structure.setter(double.class, index);
       if(handle == null) throw new IllegalStateException("Unable to locate method handle");
-
       handle.invoke(this.packet(), value);
     }
   }
@@ -224,13 +218,10 @@ public final class PacketRemapper {
     private static <E> @NonNull Structure<E> generate(final @NonNull Logger logger, final MethodHandles.@NonNull Lookup lookup,
                                                       final @NonNull Class<E> packet) {
       final Map<Class<?>, List<Handle>> handleMap = Maps.newHashMap();
-
-      // Search function to grab fields from the packet class and other super classes.
       Structure.find(packet, Class::getSuperclass, fields -> {
         for(final Field field : fields) {
           try {
             field.setAccessible(true);
-
             final List<Handle> methodHandles = handleMap.computeIfAbsent(field.getType(), key -> new ArrayList<>());
             methodHandles.add(new Handle(lookup.unreflectGetter(field), lookup.unreflectSetter(field)));
           } catch(Throwable throwable) {
@@ -247,7 +238,6 @@ public final class PacketRemapper {
           }
         }
       });
-
       return new Structure<>(packet, handleMap);
     }
 
@@ -257,7 +247,6 @@ public final class PacketRemapper {
       while(searchClass != null) {
         final Field[] fields = searchClass.getDeclaredFields();
         fieldSearch.accept(fields);
-
         searchClass = superSearch.apply(searchClass);
       }
     }

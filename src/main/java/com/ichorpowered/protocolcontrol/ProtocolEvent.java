@@ -62,12 +62,12 @@ public final class ProtocolEvent {
 
   protected void enable() {
     if(this.enabled) return;
+    this.bus = new SimpleEventBus<>(Object.class);
+    this.methodAdapter = new SimpleMethodSubscriptionAdapter<>(this.bus, new ASMEventExecutorFactory<>());
     this.service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactoryBuilder()
       .setNameFormat("ProtocolControl Network Executor - #%d")
       .setDaemon(true)
       .build());
-    this.bus = new SimpleEventBus<>(Object.class);
-    this.methodAdapter = new SimpleMethodSubscriptionAdapter<>(this.bus, new ASMEventExecutorFactory<>());
     this.enabled = true;
   }
 
