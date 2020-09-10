@@ -85,15 +85,11 @@ public final class PacketHandler extends ChannelDuplexHandler {
         if(!this.injected) {
           final Incoming incoming = new Incoming(this);
           final Outgoing outgoing = new Outgoing(this);
-
-          context.pipeline().remove(this).addBefore("packet_handler", "protocolcontrol_listener", this);
+          context.pipeline().remove(this).addBefore("packet_handler", ProtocolInjector.CHANNEL_HANDLER, this);
           context.pipeline().addAfter("decoder", ProtocolInjector.INCOMING_HANDLER, incoming);
           context.pipeline().addAfter("packet_handler", ProtocolInjector.OUTGOING_HANDLER, outgoing);
-
           this.remapper.structure(SPacketLoginSuccess.class); // Prepare the structure early.
-
           this.profile.active(true);
-
           this.injected = true;
         }
       },
@@ -105,7 +101,6 @@ public final class PacketHandler extends ChannelDuplexHandler {
         .detail("profile", this.profile)
         .detail("context", context.name())
     );
-
     super.channelActive(context);
   }
 
@@ -116,7 +111,6 @@ public final class PacketHandler extends ChannelDuplexHandler {
         if(message instanceof SPacketLoginSuccess) {
           final PacketRemapper.Wrapped<SPacketLoginSuccess> wrapped = this.remapper.wrap((SPacketLoginSuccess) message);
           final GameProfile profile = wrapped.get(GameProfile.class, 0);
-
           if(profile != null) {
             this.profile.player(profile.getId());
             this.channels.add(this.profile);
@@ -135,7 +129,6 @@ public final class PacketHandler extends ChannelDuplexHandler {
         .detail("context", context.name())
         .detail("message", message)
     );
-
     super.write(context, message, promise);
   }
 
@@ -146,7 +139,6 @@ public final class PacketHandler extends ChannelDuplexHandler {
         if(this.injected) {
           final UUID player = this.profile.player();
           if(player != null) this.channels.remove(player);
-
           this.profile.active(false);
         }
       },
@@ -158,80 +150,83 @@ public final class PacketHandler extends ChannelDuplexHandler {
         .detail("profile", this.profile)
         .detail("context", context.name())
     );
-
     super.channelInactive(context);
   }
 
   protected static class Incoming extends ChannelInboundHandlerAdapter {
-    private final PacketHandler handler;
+    private final Logger logger;
+    private final ProtocolEvent event;
+    private final ChannelProfile profile;
 
     public Incoming(final @NonNull PacketHandler handler) {
-      this.handler = handler;
+      this.logger = handler.logger();
+      this.event = handler.event();
+      this.profile = handler.profile();
     }
 
     @Override
     public void channelRead(final ChannelHandlerContext context, final Object message) throws Exception {
       Object transformedMessage = message;
       try {
-        if(transformedMessage instanceof Packet) {
-          final PacketEvent<?> packetEvent = new PacketEvent<>(this.handler.profile(), PacketDirection.INCOMING, (Packet<?>) transformedMessage);
-          this.handler.event().fire(packetEvent).get();
-
+        if(transformedMessage instanceof Packet && this.event.hasSubscribers()) {
+          final PacketEvent<?> packetEvent = new PacketEvent<>(this.profile, PacketDirection.INCOMING, (Packet<?>) transformedMessage);
+          this.event.fire(packetEvent).get();
           if(packetEvent.cancel()) return;
           transformedMessage = packetEvent.packet();
         }
       } catch(Throwable throwable) {
         Exceptions.catchingReport(
           throwable,
-          this.handler.logger(),
+          this.logger,
           PacketHandler.class,
           "packet",
           "Encountered a minor exception attempting to handle an incoming packet",
           report -> report.category("packet_read")
-            .detail("profile", this.handler.profile())
-            .detail("player", this.handler.profile().player())
+            .detail("profile", this.profile)
+            .detail("player", this.profile.player())
             .detail("context", context.name())
             .detail("message", message)
         );
       }
-
       super.channelRead(context, transformedMessage);
     }
   }
 
   protected static class Outgoing extends ChannelOutboundHandlerAdapter {
-    private final PacketHandler handler;
+    private final Logger logger;
+    private final ProtocolEvent event;
+    private final ChannelProfile profile;
 
     public Outgoing(final @NonNull PacketHandler handler) {
-      this.handler = handler;
+      this.logger = handler.logger();
+      this.event = handler.event();
+      this.profile = handler.profile();
     }
 
     @Override
     public void write(final ChannelHandlerContext context, final Object message, final ChannelPromise promise) throws Exception {
       Object transformedMessage = message;
       try {
-        if(transformedMessage instanceof Packet) {
-          final PacketEvent<?> packetEvent = new PacketEvent<>(this.handler.profile(), PacketDirection.OUTGOING, (Packet<?>) transformedMessage);
-          this.handler.event().fire(packetEvent).get();
-
+        if(transformedMessage instanceof Packet && this.event.hasSubscribers()) {
+          final PacketEvent<?> packetEvent = new PacketEvent<>(this.profile, PacketDirection.OUTGOING, (Packet<?>) transformedMessage);
+          this.event.fire(packetEvent).get();
           if(packetEvent.cancel()) return;
           transformedMessage = packetEvent.packet();
         }
       } catch(Throwable throwable) {
         Exceptions.catchingReport(
           throwable,
-          this.handler.logger(),
+          this.logger,
           PacketHandler.class,
           "packet",
           "Encountered a minor exception attempting to handle an outgoing packet",
           report -> report.category("packet_write")
-            .detail("profile", this.handler.profile())
-            .detail("player", this.handler.profile().player())
+            .detail("profile", this.profile)
+            .detail("player", this.profile.player())
             .detail("context", context.name())
             .detail("message", message)
         );
       }
-
       super.write(context, transformedMessage, promise);
     }
   }

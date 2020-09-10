@@ -38,6 +38,7 @@ import org.spongepowered.api.Game;
 
 @Singleton
 public final class ProtocolInjector {
+  public static final String CHANNEL_HANDLER = "protocolcontrol_listener";
   public static final String INCOMING_HANDLER = "protocolcontrol_incoming";
   public static final String OUTGOING_HANDLER = "protocolcontrol_outgoing";
   private final Game game;

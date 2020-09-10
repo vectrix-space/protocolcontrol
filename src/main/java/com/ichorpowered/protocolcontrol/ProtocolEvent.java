@@ -62,12 +62,10 @@ public final class ProtocolEvent {
 
   protected void enable() {
     if(this.enabled) return;
-
     this.service = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), new ThreadFactoryBuilder()
       .setNameFormat("ProtocolControl Network Executor - #%d")
       .setDaemon(true)
       .build());
-
     this.bus = new SimpleEventBus<>(Object.class);
     this.methodAdapter = new SimpleMethodSubscriptionAdapter<>(this.bus, new ASMEventExecutorFactory<>());
     this.enabled = true;
@@ -75,14 +73,29 @@ public final class ProtocolEvent {
 
   protected void disable() {
     if(!this.enabled) return;
-
     this.bus.unregisterAll();
     this.service.shutdownNow();
     this.enabled = false;
   }
 
+  /**
+   * Returns whether {@link ProtocolEvent} is enabled.
+   *
+   * @return whether events are enabled
+   */
   public boolean enabled() {
     return this.enabled;
+  }
+
+  /**
+   * Returns {@code true} if there are any {@link PacketEvent}s
+   * being subscribed to.
+   *
+   * @return whether there are any subscribers
+   */
+  public boolean hasSubscribers() {
+    if(!this.enabled) return false;
+    return this.bus.hasSubscribers(PacketEvent.class);
   }
 
   /**
@@ -114,14 +127,11 @@ public final class ProtocolEvent {
   public <T extends Packet<?>> @NonNull CompletableFuture<PacketEvent<T>> fire(final @NonNull PacketEvent<T> event) {
     requireNonNull(event, "event");
     if(!this.enabled) return CompletableFuture.completedFuture(event);
-    if(!this.bus.hasSubscribers(event.getClass())) return CompletableFuture.completedFuture(event);
-
     final CompletableFuture<PacketEvent<T>> eventFuture = new CompletableFuture<>();
     this.service.execute(() -> {
       this.postEvent(event);
       eventFuture.complete(event);
     });
-
     return eventFuture;
   }
 
@@ -135,7 +145,6 @@ public final class ProtocolEvent {
   public <T extends Packet<?>> void fireAndForget(final @NonNull PacketEvent<T> event) {
     requireNonNull(event, "event");
     if(!this.enabled) return;
-    if(!this.bus.hasSubscribers(event.getClass())) return;
     this.service.execute(() -> this.postEvent(event));
   }
 
