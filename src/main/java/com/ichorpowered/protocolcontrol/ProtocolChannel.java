@@ -69,7 +69,7 @@ public final class ProtocolChannel {
    */
   public void add(final @NonNull ChannelProfile profile) {
     requireNonNull(profile, "profile");
-    this.channels.putIfAbsent(requireNonNull(profile.player(), "player"), profile);
+    this.channels.putIfAbsent(requireNonNull(profile.id(), "player"), profile);
   }
 
   /**

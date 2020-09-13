@@ -112,7 +112,7 @@ public final class PacketHandler extends ChannelDuplexHandler {
           final PacketRemapper.Wrapped<SPacketLoginSuccess> wrapped = this.remapper.wrap((SPacketLoginSuccess) message);
           final GameProfile profile = wrapped.get(GameProfile.class, 0);
           if(profile != null) {
-            this.profile.player(profile.getId());
+            this.profile.id(profile.getId());
             this.channels.add(this.profile);
           } else {
             this.logger.warn("Failed to acquire player on login for a connected channel.");
@@ -137,7 +137,7 @@ public final class PacketHandler extends ChannelDuplexHandler {
     Exceptions.catchingReport(
       () -> {
         if(this.injected) {
-          final UUID player = this.profile.player();
+          final UUID player = this.profile.id();
           if(player != null) this.channels.remove(player);
           this.profile.active(false);
         }

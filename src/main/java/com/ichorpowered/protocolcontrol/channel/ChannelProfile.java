@@ -30,14 +30,19 @@ import com.ichorpowered.protocolcontrol.ProtocolInjector;
 import com.ichorpowered.protocolcontrol.packet.PacketDirection;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import java.lang.ref.WeakReference;
+import java.util.Optional;
 import java.util.UUID;
 import net.minecraft.network.Packet;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
 
 public final class ChannelProfile {
   private final Channel channel;
-  private @Nullable UUID player;
+  private @Nullable UUID id;
+  private WeakReference<Player> player;
   private boolean active = false;
 
   @Inject
@@ -56,21 +61,32 @@ public final class ChannelProfile {
   }
 
   /**
-   * Returns the player this channel belongs to.
+   * Returns the player identifier this channel belongs to.
    *
-   * @return the player
+   * @return the player identifier
    */
-  public @Nullable UUID player() {
-    return this.player;
+  public @Nullable UUID id() {
+    return this.id;
   }
 
   /**
-   * Sets the player this channel belongs to.
+   * Sets the player identifier this channel belongs to.
    *
-   * @param player the player
+   * @param player the player identifier
    */
-  public void player(final @Nullable UUID player) {
-    this.player = player;
+  public void id(final @Nullable UUID player) {
+    this.id = player;
+  }
+
+  /**
+   * Returns the player this channel belongs to, if it exists.
+   *
+   * @return the player, if present
+   */
+  public @NonNull Optional<Player> player() {
+    if(this.id == null) return Optional.empty();
+    if(this.player != null) return Optional.ofNullable(this.player.get());
+    return this.player(this.id);
   }
 
   /**
@@ -139,6 +155,13 @@ public final class ChannelProfile {
     } else {
       this.channel.pipeline().fireChannelRead(message);
     }
+  }
+
+  private @NonNull Optional<Player> player(final @NonNull UUID id) {
+    if (!Sponge.isServerAvailable()) return Optional.empty();
+    final Optional<Player> optionalPlayer = Sponge.getServer().getPlayer(id);
+    optionalPlayer.ifPresent(value -> this.player = new WeakReference<>(value));
+    return optionalPlayer;
   }
 
   public interface Factory {
