@@ -53,9 +53,9 @@ dependencies {
   compile 'net.kyori:mu:1.0.0-SNAPSHOT'
   compile 'net.kyori:violet:1.2.0-SNAPSHOT'
   compile 'net.kyori:indigo:1.0.0-SNAPSHOT'
-  compile "net.kyori:event-method-asm:3.0.0"
-  compileOnly "org.spongepowered:spongeapi:7.2.0"
-  annotationProcessor "org.spongepowered:spongeapi:7.2.0"
+  compile "net.kyori:event-method-asm:4.0.0-SNAPSHOT"
+  compileOnly "org.spongepowered:spongeapi:7.3.0"
+  annotationProcessor "org.spongepowered:spongeapi:7.3.0"
 }
 
 tasks.withType(JavaCompile) {
