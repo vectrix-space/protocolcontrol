@@ -53,16 +53,6 @@ public final class ChannelProfile {
   }
 
   /**
-   * Returns the {@link Channel} this profile belongs
-   * to.
-   *
-   * @return the channel
-   */
-  public @NonNull Channel channel() {
-    return this.channel;
-  }
-
-  /**
    * Returns the player identifier this channel belongs to.
    *
    * @return the player identifier
@@ -134,7 +124,7 @@ public final class ChannelProfile {
    */
   public <T extends Packet<?>> void send(final @NonNull PacketDirection direction, final @NonNull T packet,
                                          final boolean currentThread) {
-    if(!this.channel.isActive()) return;
+    if(!this.active || !this.channel.isActive()) return;
     if(direction == PacketDirection.INCOMING) {
       final ChannelHandlerContext context = this.channel.pipeline().context(ProtocolInjector.INCOMING_HANDLER);
       if(currentThread) {
@@ -159,7 +149,7 @@ public final class ChannelProfile {
    * @param consumer the channel consumer
    */
   public void execute(final @NonNull Consumer<ChannelProfile> consumer) {
-    if(!this.channel.isActive()) return;
+    if(!this.active || !this.channel.isActive()) return;
     this.channel.eventLoop().execute(() -> consumer.accept(this));
   }
 
