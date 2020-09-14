@@ -30,9 +30,11 @@ import com.ichorpowered.protocolcontrol.ProtocolInjector;
 import com.ichorpowered.protocolcontrol.packet.PacketDirection;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.EventLoop;
 import java.lang.ref.WeakReference;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 import net.minecraft.network.Packet;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -132,21 +134,33 @@ public final class ChannelProfile {
    */
   public <T extends Packet<?>> void send(final @NonNull PacketDirection direction, final @NonNull T packet,
                                          final boolean currentThread) {
+    if(!this.channel.isActive()) return;
     if(direction == PacketDirection.INCOMING) {
       final ChannelHandlerContext context = this.channel.pipeline().context(ProtocolInjector.INCOMING_HANDLER);
       if(currentThread) {
         this.read(context, packet);
       } else {
-        this.channel.eventLoop().execute(() -> this.read(context, packet));
+        this.execute(channel -> this.read(context, packet));
       }
     } else {
       final ChannelHandlerContext context = this.channel.pipeline().context(ProtocolInjector.OUTGOING_HANDLER);
       if(currentThread) {
         context.write(packet, this.channel.voidPromise());
       } else {
-        this.channel.eventLoop().execute(() -> context.write(packet, this.channel.voidPromise()));
+        this.execute(channel -> context.write(packet, this.channel.voidPromise()));
       }
     }
+  }
+
+  /**
+   * Executes the specified {@link Consumer} on this {@link ChannelProfile}s
+   * {@link EventLoop}.
+   *
+   * @param consumer the channel consumer
+   */
+  public void execute(final @NonNull Consumer<ChannelProfile> consumer) {
+    if(!this.channel.isActive()) return;
+    this.channel.eventLoop().execute(() -> consumer.accept(this));
   }
 
   private void read(final @Nullable ChannelHandlerContext context, final @NonNull Object message) {
