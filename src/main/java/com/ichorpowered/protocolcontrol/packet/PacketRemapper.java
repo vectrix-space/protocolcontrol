@@ -25,8 +25,10 @@
 package com.ichorpowered.protocolcontrol.packet;
 
 import com.google.common.collect.Maps;
+import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.ichorpowered.protocolcontrol.translator.Translator;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
@@ -46,15 +48,18 @@ import static java.util.Objects.requireNonNull;
  * reflection and {@link MethodHandle} lookups.
  */
 @Singleton
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "UnstableApiUsage"})
 public final class PacketRemapper {
   private final Map<Class<?>, PacketStructure<?>> structures = Maps.newHashMap();
   private final MethodHandles.Lookup lookup = MethodHandles.lookup();
   private final Logger logger;
+  private final PacketTranslation translation;
 
   @Inject
-  public PacketRemapper(final Logger logger) {
+  public PacketRemapper(final Logger logger,
+                        final PacketTranslation translation) {
     this.logger = logger;
+    this.translation = translation;
   }
 
   /**
@@ -77,7 +82,7 @@ public final class PacketRemapper {
    * @return the packet wrapper
    */
   public <T> @NonNull Wrapped<T> wrap(final @NonNull T packet) {
-    return new Wrapped<>(requireNonNull(packet, "packet"), this.structure(packet.getClass()));
+    return new Wrapped<>(requireNonNull(packet, "packet"), this.structure(packet.getClass()), this.translation);
   }
 
   /**
@@ -89,10 +94,13 @@ public final class PacketRemapper {
   public static final class Wrapped<T> {
     private final T packet;
     private final PacketStructure<T> structure;
+    private final PacketTranslation translation;
 
-    /* package */ Wrapped(final @NonNull T packet, final @NonNull PacketStructure<T> structure) {
+    /* package */ Wrapped(final @NonNull T packet, final @NonNull PacketStructure<T> structure,
+                          final @NonNull PacketTranslation translation) {
       this.packet = requireNonNull(packet, "packet");
       this.structure = requireNonNull(structure, "structure");
+      this.translation = requireNonNull(translation, "translation");
     }
 
     /**
@@ -102,6 +110,45 @@ public final class PacketRemapper {
      */
     public @NonNull T packet() {
       return this.packet;
+    }
+
+    /**
+     * Returns the element {@code E} of {@link TypeToken} type at
+     * the specified index position of the fields in the packet
+     * class using the appropriate translator.
+     *
+     * @param type the element type token
+     * @param index the element index
+     * @param <E> the element type
+     * @return the element
+     * @throws Throwable exceptions attempting to locate the
+     *                   translator, locate or parse the field
+     *                   or the fields element
+     */
+    public <E> @Nullable E translateGet(final @NonNull TypeToken<E> type, final int index) throws Throwable {
+      final Translator<E> translator = this.translation.translate(type);
+      if(translator == null) throw new IllegalStateException("Unable to locate translator");
+      final Object field = this.get(translator.translatable(), index);
+      return translator.wrap(field);
+    }
+
+    /**
+     * Returns the element {@code E} of {@link TypeToken} type at
+     * the specified index position of the fields in the packet
+     * class.
+     *
+     * @param type the element type token
+     * @param index the element index
+     * @param <E> the element type
+     * @return the element
+     * @throws Throwable exceptions attempting to locate or parse
+     *                   the field or the fields element
+     */
+    public <E> @Nullable E get(final @NonNull TypeToken<E> type, final int index) throws Throwable {
+      final MethodHandle handle = this.structure.getter(requireNonNull(type, "type"), index);
+      if(handle == null) throw new IllegalStateException("Unable to locate method handle");
+      final Object field = handle.invoke(this.packet());
+      return field != null ? (E) field : null;
     }
 
     /**
@@ -121,6 +168,41 @@ public final class PacketRemapper {
       if(handle == null) throw new IllegalStateException("Unable to locate method handle");
       final Object field = handle.invoke(this.packet());
       return field != null ? type.cast(field) : null;
+    }
+
+    /**
+     * Sets the element {@code E} of {@link TypeToken} type at the
+     * specified index position of the fields in the packet class
+     * to the specified value using the appropriate translator.
+     *
+     * @param type the element type token
+     * @param index the element index
+     * @param value the element
+     * @param <E> the element type
+     * @throws Throwable exceptions attempting to locate the
+     *                   translator or locate the field
+     */
+    public <E> void translateSet(final @NonNull TypeToken<E> type, final int index, final @Nullable E value) throws Throwable {
+      final Translator<E> translator = this.translation.translate(type);
+      if(translator == null) throw new IllegalStateException("Unable to locate translator");
+      this.set(translator.translatable(), index, translator.unwrap(value));
+    }
+
+    /**
+     * Sets the element {@code E} of {@link TypeToken} type at the
+     * specified index position of the fields in the packet class
+     * to the specified value.
+     *
+     * @param type the element type token
+     * @param index the element index
+     * @param value the element
+     * @param <E> the element type
+     * @throws Throwable exceptions attempting to locate the field
+     */
+    public <E> void set(final @NonNull TypeToken<E> type, final int index, final @Nullable E value) throws Throwable {
+      final MethodHandle handle = this.structure.setter(requireNonNull(type, "type"), index);
+      if(handle == null) throw new IllegalStateException("Unable to locate method handle");
+      handle.invoke(this.packet(), value);
     }
 
     /**

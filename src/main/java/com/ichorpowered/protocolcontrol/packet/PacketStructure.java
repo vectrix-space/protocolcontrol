@@ -25,6 +25,7 @@
 package com.ichorpowered.protocolcontrol.packet;
 
 import com.google.common.collect.Maps;
+import com.google.common.reflect.TypeToken;
 import com.ichorpowered.protocolcontrol.util.Exceptions;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -47,15 +48,16 @@ import static java.util.Objects.requireNonNull;
  *
  * @param <T> the packet type
  */
+@SuppressWarnings("UnstableApiUsage")
 public final class PacketStructure<T> {
   protected static <E> @NonNull PacketStructure<E> generate(final @NonNull Logger logger, final MethodHandles.@NonNull Lookup lookup,
                                                             final @NonNull Class<E> packet) {
-    final Map<Class<?>, List<Handle>> handleMap = Maps.newHashMap();
+    final Map<TypeToken<?>, List<Handle>> handleMap = Maps.newHashMap();
     PacketStructure.find(packet, Class::getSuperclass, fields -> {
       for(final Field field : fields) {
         try {
           field.setAccessible(true);
-          final List<Handle> methodHandles = handleMap.computeIfAbsent(field.getType(), key -> new ArrayList<>());
+          final List<Handle> methodHandles = handleMap.computeIfAbsent(TypeToken.of(field.getType()), key -> new ArrayList<>());
           methodHandles.add(new Handle(lookup.unreflectGetter(field), lookup.unreflectSetter(field)));
         } catch(Throwable throwable) {
           Exceptions.catchingReport(
@@ -85,9 +87,9 @@ public final class PacketStructure<T> {
   }
 
   private final Class<T> packet;
-  private final Map<Class<?>, List<Handle>> handles;
+  private final Map<TypeToken<?>, List<Handle>> handles;
 
-  /* package */ PacketStructure(final @NonNull Class<T> packet, final @NonNull Map<Class<?>, List<Handle>> handles) {
+  /* package */ PacketStructure(final @NonNull Class<T> packet, final @NonNull Map<TypeToken<?>, List<Handle>> handles) {
     this.packet = packet;
     this.handles = handles;
   }
@@ -96,15 +98,29 @@ public final class PacketStructure<T> {
     return this.packet;
   }
 
+  public @Nullable MethodHandle getter(final @NonNull TypeToken<?> type, final int index) {
+    return this.getter0(requireNonNull(type, "type"), index);
+  }
+
   public @Nullable MethodHandle getter(final @NonNull Class<?> type, final int index) {
-    requireNonNull(type, "type");
+    return this.getter0(TypeToken.of(requireNonNull(type, "type")), index);
+  }
+
+  public @Nullable MethodHandle setter(final @NonNull TypeToken<?> type, final int index) {
+    return this.setter0(requireNonNull(type, "type"), index);
+  }
+
+  public @Nullable MethodHandle setter(final @NonNull Class<?> type, final int index) {
+    return this.setter0(TypeToken.of(requireNonNull(type, "type")), index);
+  }
+
+  private @Nullable MethodHandle getter0(final @NonNull TypeToken<?> type, final int index) {
     final List<Handle> handles = this.handles.get(type);
     if(handles == null || index < 0 || index >= handles.size()) return null;
     return handles.get(index).getter();
   }
 
-  public @Nullable MethodHandle setter(final @NonNull Class<?> type, final int index) {
-    requireNonNull(type, "type");
+  private @Nullable MethodHandle setter0(final @NonNull TypeToken<?> type, final int index) {
     final List<Handle> handles = this.handles.get(type);
     if(handles == null || index < 0 || index >= handles.size()) return null;
     return handles.get(index).setter();

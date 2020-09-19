@@ -22,35 +22,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.ichorpowered.protocolcontrol.packet.translator;
+package com.ichorpowered.protocolcontrol.translator;
 
+import com.google.common.reflect.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Represents a function to wrap and unwrap raw packet
- * field types, to custom wrapper types in order to make
- * it easy to manipulate packet data efficiently.
+ * field types, to a {@code T} in order to make it easy
+ * to manipulate packet data efficiently.
  *
- * @param <A> the translatable type
- * @param <B> the translation type
+ * @param <T> the translation type
  */
-public interface Translator<A, B extends AbstractTranslation<A>> {
+@SuppressWarnings("UnstableApiUsage")
+public interface Translator<T> {
   /**
-   * Wraps the specified {@code A} object into this translators
-   * {@code B} wrapper.
+   * Returns the translatable {@link TypeToken}.
+   *
+   * @return the translatable type
+   */
+  @NonNull TypeToken<?> translatable();
+
+  /**
+   * Wraps the specified object into this {@code T}
+   * translation.
    *
    * @param object the translatable object
    * @return the translation object
    */
-  @Nullable B wrap(@NonNull A object);
+  @Nullable T wrap(@Nullable Object object);
 
   /**
-   * Unwraps the specified {@code B} translation into the {@code A}
-   * translatable object.
+   * Unwraps the specified {@code T} translation into
+   * an object.
    *
    * @param translation the translation object
    * @return the translatable object
    */
-  @Nullable A unwrap(@NonNull B translation);
+  <E> @Nullable E unwrap(@Nullable T translation);
 }

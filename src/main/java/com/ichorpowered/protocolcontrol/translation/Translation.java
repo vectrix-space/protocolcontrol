@@ -22,25 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.ichorpowered.protocolcontrol;
+package com.ichorpowered.protocolcontrol.translation;
 
-import com.ichorpowered.protocolcontrol.channel.ChannelInitializer;
-import com.ichorpowered.protocolcontrol.channel.ChannelProfile;
-import com.ichorpowered.protocolcontrol.packet.PacketRemapper;
-import com.ichorpowered.protocolcontrol.packet.PacketTranslation;
-import com.ichorpowered.protocolcontrol.service.ProtocolService;
-import com.ichorpowered.protocolcontrol.service.SimpleProtocolService;
-import net.kyori.violet.AbstractModule;
-
-public final class ProtocolModule extends AbstractModule {
-  @Override
-  protected void configure() {
-    this.bind(ChannelInitializer.class);
-    this.bind(PacketRemapper.class);
-    this.bind(PacketTranslation.class);
-    this.bind(ProtocolEvent.class);
-    this.bind(ProtocolInjector.class);
-    this.bind(ProtocolService.class).to(SimpleProtocolService.class);
-    this.installFactory(ChannelProfile.Factory.class);
-  }
+public interface Translation {
 }

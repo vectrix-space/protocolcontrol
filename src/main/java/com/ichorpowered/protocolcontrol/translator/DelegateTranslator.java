@@ -22,45 +22,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.ichorpowered.protocolcontrol.packet.translator;
+package com.ichorpowered.protocolcontrol.translator;
 
+import com.google.common.reflect.TypeToken;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import static java.util.Objects.requireNonNull;
+@SuppressWarnings({"unchecked", "UnstableApiUsage"})
+public final class DelegateTranslator<T> implements Translator<T> {
+  private final TypeToken<?> translatable;
 
-public abstract class AbstractTranslation<T> {
-  private final Class<T> type;
-  private T instance;
-
-  public AbstractTranslation(final @NonNull Class<T> type, final @NonNull T instance) {
-    this.type = requireNonNull(type, "type");
-    this.instance = requireNonNull(instance, "instance");
+  public DelegateTranslator(final @NonNull TypeToken<?> translatable) {
+    this.translatable = translatable;
   }
 
-  /**
-   * Returns the raw {@code T} translatable type.
-   *
-   * @return the translatable type
-   */
-  public @NonNull Class<T> type() {
-    return this.type;
+  @Override
+  public @NonNull TypeToken<?> translatable() {
+    return this.translatable;
   }
 
-  /**
-   * Returns the raw {@code T} translatable object.
-   *
-   * @return the translatable object
-   */
-  public @NonNull T instance() {
-    return this.instance;
+  @Override
+  public @Nullable T wrap(final @Nullable Object object) {
+    return (T) object;
   }
 
-  /**
-   * Sets the raw {@code T} translatable object.
-   *
-   * @param instance the translatable object
-   */
-  public void instance(final @NonNull T instance) {
-    this.instance = requireNonNull(instance, "instance");
+  @Override
+  public <E> @Nullable E unwrap(final @Nullable T translation) {
+    return (E) translation;
   }
 }
