@@ -33,7 +33,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import static java.util.Objects.requireNonNull;
 
 /**
- * An event containing the {@code T} packet, the {@link PacketDirection}
+ * An event containing the packet, the {@link PacketDirection}
  * and the {@link ChannelProfile} which it applies to.
  */
 @SuppressWarnings("UnstableApiUsage")

@@ -24,6 +24,10 @@
  */
 package com.ichorpowered.protocolcontrol.event;
 
+/**
+ * Represents the order an event will be posted to a subscribed
+ * listener, relative to the other subscribed listeners.
+ */
 public enum EventOrder {
   FIRST,
   EARLY,

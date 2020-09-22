@@ -24,10 +24,18 @@
  */
 package com.ichorpowered.protocolcontrol.event;
 
-import com.ichorpowered.protocolcontrol.event.annotation.Subscribe;
-
+/**
+ * Represents an interface to allow a direct invocation of an
+ * event from the bus.
+ *
+ * @param <E> the event type
+ */
 @FunctionalInterface
 public interface EventHandler<E> {
-  @Subscribe()
-  void execute(E notification);
+  /**
+   * Handles an invoked event.
+   *
+   * @param event the event
+   */
+  void invoke(E event);
 }

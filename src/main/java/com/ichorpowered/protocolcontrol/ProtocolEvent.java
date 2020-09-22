@@ -37,7 +37,6 @@ import com.ichorpowered.protocolcontrol.packet.PacketDirection;
 import com.ichorpowered.protocolcontrol.packet.PacketType;
 import com.ichorpowered.protocolcontrol.util.Exceptions;
 import java.util.Collection;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -71,12 +70,12 @@ public final class ProtocolEvent {
     if(this.enabled) return;
     this.bus = new SimpleEventBus<Object>(Object.class) {
       @Override
-      protected boolean shouldPost(final @NonNull Object event, final @NonNull EventSubscriber subscriber) {
+      protected boolean shouldPost(final @NonNull Object event, final @NonNull EventSubscriber<?> subscriber) {
         if(event instanceof PacketEvent && subscriber instanceof ProtocolEventSubscriber) {
           final PacketEvent packetEvent = (PacketEvent) event;
           final ProtocolEventSubscriber<?> protocolSubscriber = (ProtocolEventSubscriber<?>) subscriber;
           if(protocolSubscriber.packetType() != PacketType.UNSPECIFIED) {
-            if(!Objects.equals(protocolSubscriber.packetType().type(), packetEvent.type())) return false;
+            if(!protocolSubscriber.packetType().validate(packetEvent.type())) return false;
           }
           if(protocolSubscriber.packetDirection() != PacketDirection.UNSPECIFIED) {
             if(protocolSubscriber.packetDirection() != packetEvent.direction()) return false;
@@ -223,7 +222,7 @@ public final class ProtocolEvent {
 
     @Override
     public void invoke(final @NonNull E event) throws Throwable {
-      this.handler.execute(event);
+      this.handler.invoke(event);
     }
   }
 }

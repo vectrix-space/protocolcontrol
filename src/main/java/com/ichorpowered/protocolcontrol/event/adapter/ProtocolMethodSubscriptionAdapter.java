@@ -95,6 +95,9 @@ public final class ProtocolMethodSubscriptionAdapter implements MethodSubscripti
    * {@link Method} at runtime.
    */
   public static final class SubscriberGenerationException extends RuntimeException {
+    private static final long serialVersionUID = -313293888991253131L;
+
+    private
     SubscriberGenerationException(final String message) {
       super(message);
     }

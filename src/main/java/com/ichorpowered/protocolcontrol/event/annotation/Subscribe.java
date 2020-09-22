@@ -32,14 +32,41 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * An annotation that indicates that marks a method as a listener
+ * for protocol events.
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Subscribe {
+  /**
+   * The {@link EventOrder} of events that will be posted to
+   * this listener.
+   *
+   * @return the order
+   */
   EventOrder order() default EventOrder.NORMAL;
 
+  /**
+   * The {@link PacketType} events must have in order to
+   * be posted to this listener.
+   *
+   * @return the packet type
+   */
   PacketType type() default PacketType.UNSPECIFIED;
 
+  /**
+   * The {@link PacketDirection} events must have in order to
+   * be posted to this listener.
+   *
+   * @return the packet direction
+   */
   PacketDirection direction() default PacketDirection.UNSPECIFIED;
 
+  /**
+   * Whether to ignore cancelled events posted to this listener.
+   *
+   * @return whether to ignore cancelled events
+   */
   boolean ignoreCancelled() default false;
 }
