@@ -22,32 +22,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.ichorpowered.protocolcontrol.packet;
+package com.ichorpowered.protocolcontrol.packet.translator;
 
-import com.ichorpowered.protocolcontrol.event.PacketEvent;
+import com.google.common.reflect.TypeToken;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
- * Represents the direction a packet is traveling.
+ * Represents a function to wrap and unwrap raw packet
+ * field types, to a {@code T} in order to make it easy
+ * to manipulate packet data efficiently.
+ *
+ * @param <T> the translation type
  */
-public enum PacketDirection {
+@SuppressWarnings("UnstableApiUsage")
+public interface Translator<T> {
   /**
-   * The direction for when a packet is to be sent from the
-   * client to the server.
-   */
-  INCOMING,
-
-  /**
-   * The direction for when a packet is to be sent from the
-   * server to the client.
-   */
-  OUTGOING,
-
-  /**
-   * The direction is not specified and can be either
-   * {@link PacketDirection#INCOMING} or {@link PacketDirection#OUTGOING}.
+   * Returns the translatable {@link TypeToken}.
    *
-   * <p>Used as the default when filtering for {@link PacketEvent}s
-   * in a specific direction. This should not be used anywhere else.</p>
+   * @return the translatable type
    */
-  UNSPECIFIED
+  @NonNull TypeToken<?> translatable();
+
+  /**
+   * Wraps the specified object into this {@code T}
+   * translation.
+   *
+   * @param object the translatable object
+   * @return the translation object
+   */
+  @Nullable T wrap(@Nullable Object object);
+
+  /**
+   * Unwraps the specified {@code T} translation into
+   * an object.
+   *
+   * @param translation the translation object
+   * @return the translatable object
+   */
+  <E> @Nullable E unwrap(@Nullable T translation);
 }

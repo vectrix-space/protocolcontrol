@@ -169,9 +169,9 @@ public final class PacketHandler extends ChannelDuplexHandler {
       Object transformedMessage = message;
       try {
         if(transformedMessage instanceof Packet && this.event.hasSubscribers()) {
-          final PacketEvent<?> packetEvent = new PacketEvent<>(this.profile, PacketDirection.INCOMING, (Packet<?>) transformedMessage);
+          final PacketEvent packetEvent = new PacketEvent(this.profile, PacketDirection.INCOMING, transformedMessage);
           this.event.fire(packetEvent).get();
-          if(packetEvent.cancel()) return;
+          if(packetEvent.cancelled()) return;
           transformedMessage = packetEvent.packet();
         }
       } catch(Throwable throwable) {
@@ -208,9 +208,9 @@ public final class PacketHandler extends ChannelDuplexHandler {
       Object transformedMessage = message;
       try {
         if(transformedMessage instanceof Packet && this.event.hasSubscribers()) {
-          final PacketEvent<?> packetEvent = new PacketEvent<>(this.profile, PacketDirection.OUTGOING, (Packet<?>) transformedMessage);
+          final PacketEvent packetEvent = new PacketEvent(this.profile, PacketDirection.OUTGOING, transformedMessage);
           this.event.fire(packetEvent).get();
-          if(packetEvent.cancel()) return;
+          if(packetEvent.cancelled()) return;
           transformedMessage = packetEvent.packet();
         }
       } catch(Throwable throwable) {

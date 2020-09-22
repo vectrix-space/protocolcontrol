@@ -22,32 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.ichorpowered.protocolcontrol.packet;
+package com.ichorpowered.protocolcontrol.event;
 
-import com.ichorpowered.protocolcontrol.event.PacketEvent;
+import com.ichorpowered.protocolcontrol.event.annotation.Subscribe;
 
-/**
- * Represents the direction a packet is traveling.
- */
-public enum PacketDirection {
-  /**
-   * The direction for when a packet is to be sent from the
-   * client to the server.
-   */
-  INCOMING,
-
-  /**
-   * The direction for when a packet is to be sent from the
-   * server to the client.
-   */
-  OUTGOING,
-
-  /**
-   * The direction is not specified and can be either
-   * {@link PacketDirection#INCOMING} or {@link PacketDirection#OUTGOING}.
-   *
-   * <p>Used as the default when filtering for {@link PacketEvent}s
-   * in a specific direction. This should not be used anywhere else.</p>
-   */
-  UNSPECIFIED
+@FunctionalInterface
+public interface EventHandler<E> {
+  @Subscribe()
+  void execute(E notification);
 }

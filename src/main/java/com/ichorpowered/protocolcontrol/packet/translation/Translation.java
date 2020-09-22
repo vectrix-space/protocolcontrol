@@ -22,43 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.ichorpowered.protocolcontrol.translator;
+package com.ichorpowered.protocolcontrol.packet.translation;
 
-import com.google.common.reflect.TypeToken;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-
-/**
- * Represents a function to wrap and unwrap raw packet
- * field types, to a {@code T} in order to make it easy
- * to manipulate packet data efficiently.
- *
- * @param <T> the translation type
- */
-@SuppressWarnings("UnstableApiUsage")
-public interface Translator<T> {
-  /**
-   * Returns the translatable {@link TypeToken}.
-   *
-   * @return the translatable type
-   */
-  @NonNull TypeToken<?> translatable();
-
-  /**
-   * Wraps the specified object into this {@code T}
-   * translation.
-   *
-   * @param object the translatable object
-   * @return the translation object
-   */
-  @Nullable T wrap(@Nullable Object object);
-
-  /**
-   * Unwraps the specified {@code T} translation into
-   * an object.
-   *
-   * @param translation the translation object
-   * @return the translatable object
-   */
-  <E> @Nullable E unwrap(@Nullable T translation);
+public interface Translation {
 }

@@ -28,7 +28,7 @@ import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.ichorpowered.protocolcontrol.translator.Translator;
+import com.ichorpowered.protocolcontrol.packet.translator.Translator;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;

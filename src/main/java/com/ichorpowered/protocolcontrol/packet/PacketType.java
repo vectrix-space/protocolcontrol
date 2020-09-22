@@ -22,32 +22,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.ichorpowered.protocolcontrol.translator;
+package com.ichorpowered.protocolcontrol.packet;
 
 import com.google.common.reflect.TypeToken;
-import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-@SuppressWarnings({"unchecked", "UnstableApiUsage"})
-public final class DelegateTranslator<T> implements Translator<T> {
-  private final TypeToken<?> translatable;
+@SuppressWarnings("UnstableApiUsage")
+public enum PacketType {
+  UNSPECIFIED(null);
 
-  public DelegateTranslator(final @NonNull TypeToken<?> translatable) {
-    this.translatable = translatable;
+  private final TypeToken<?> packet;
+
+  PacketType(final @Nullable TypeToken<?> packet) {
+    this.packet = packet;
   }
 
-  @Override
-  public @NonNull TypeToken<?> translatable() {
-    return this.translatable;
-  }
-
-  @Override
-  public @Nullable T wrap(final @Nullable Object object) {
-    return (T) object;
-  }
-
-  @Override
-  public <E> @Nullable E unwrap(final @Nullable T translation) {
-    return (E) translation;
+  public @Nullable TypeToken<?> type() {
+    return this.packet;
   }
 }

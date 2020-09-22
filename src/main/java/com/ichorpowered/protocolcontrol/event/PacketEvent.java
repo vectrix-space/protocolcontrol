@@ -27,8 +27,7 @@ package com.ichorpowered.protocolcontrol.event;
 import com.google.common.reflect.TypeToken;
 import com.ichorpowered.protocolcontrol.channel.ChannelProfile;
 import com.ichorpowered.protocolcontrol.packet.PacketDirection;
-import net.kyori.event.ReifiedEvent;
-import net.minecraft.network.Packet;
+import net.kyori.event.Cancellable;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import static java.util.Objects.requireNonNull;
@@ -36,18 +35,16 @@ import static java.util.Objects.requireNonNull;
 /**
  * An event containing the {@code T} packet, the {@link PacketDirection}
  * and the {@link ChannelProfile} which it applies to.
- *
- * @param <T> the packet type
  */
-public final class PacketEvent<T extends Packet<?>> implements ReifiedEvent<T> {
+@SuppressWarnings("UnstableApiUsage")
+public final class PacketEvent extends Cancellable.Impl {
   private final ChannelProfile profile;
   private final PacketDirection direction;
-  private T packet;
-  private boolean cancel = false;
+  private Object packet;
 
   public PacketEvent(final @NonNull ChannelProfile profile,
                      final @NonNull PacketDirection direction,
-                     final @NonNull T packet) {
+                     final @NonNull Object packet) {
     this.profile = requireNonNull(profile, "profile");
     this.direction = requireNonNull(direction, "direction");
     this.packet = requireNonNull(packet, "packet");
@@ -72,45 +69,29 @@ public final class PacketEvent<T extends Packet<?>> implements ReifiedEvent<T> {
   }
 
   /**
-   * Returns the {@code T} packet object.
+   * Returns the packet {@link TypeToken}.
+   *
+   * @return the packet type token
+   */
+  public @NonNull TypeToken<?> type() {
+    return TypeToken.of(this.packet.getClass());
+  }
+
+  /**
+   * Returns the packet object.
    *
    * @return the packet object
    */
-  public @NonNull T packet() {
+  public @NonNull Object packet() {
     return this.packet;
   }
 
   /**
-   * Sets the {@code T} packet object.
+   * Sets the packet object.
    *
    * @param packet the packet object
    */
-  public void packet(final @NonNull T packet) {
+  public void packet(final @NonNull Object packet) {
     this.packet = requireNonNull(packet, "packet");
-  }
-
-  /**
-   * Returns {@code true} if the packet
-   * should cancel.
-   *
-   * @return whether the packet should be cancelled
-   */
-  public boolean cancel() {
-    return this.cancel;
-  }
-
-  /**
-   * Sets whether the packet should cancel.
-   *
-   * @param cancel whether the packet should cancel
-   */
-  public void cancel(final boolean cancel) {
-    this.cancel = cancel;
-  }
-
-  @SuppressWarnings({"unchecked", "UnstableApiUsage"})
-  @Override
-  public @NonNull TypeToken<T> type() {
-    return (TypeToken<T>) TypeToken.of(this.packet.getClass());
   }
 }

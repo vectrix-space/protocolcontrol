@@ -22,32 +22,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.ichorpowered.protocolcontrol.packet;
+package com.ichorpowered.protocolcontrol.event.annotation;
 
-import com.ichorpowered.protocolcontrol.event.PacketEvent;
+import com.ichorpowered.protocolcontrol.event.EventOrder;
+import com.ichorpowered.protocolcontrol.packet.PacketDirection;
+import com.ichorpowered.protocolcontrol.packet.PacketType;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-/**
- * Represents the direction a packet is traveling.
- */
-public enum PacketDirection {
-  /**
-   * The direction for when a packet is to be sent from the
-   * client to the server.
-   */
-  INCOMING,
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface Subscribe {
+  EventOrder order() default EventOrder.NORMAL;
 
-  /**
-   * The direction for when a packet is to be sent from the
-   * server to the client.
-   */
-  OUTGOING,
+  PacketType type() default PacketType.UNSPECIFIED;
 
-  /**
-   * The direction is not specified and can be either
-   * {@link PacketDirection#INCOMING} or {@link PacketDirection#OUTGOING}.
-   *
-   * <p>Used as the default when filtering for {@link PacketEvent}s
-   * in a specific direction. This should not be used anywhere else.</p>
-   */
-  UNSPECIFIED
+  PacketDirection direction() default PacketDirection.UNSPECIFIED;
+
+  boolean ignoreCancelled() default false;
 }

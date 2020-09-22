@@ -28,7 +28,7 @@ import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.ichorpowered.protocolcontrol.translator.Translator;
+import com.ichorpowered.protocolcontrol.packet.translator.Translator;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -44,7 +44,8 @@ public final class PacketTranslation {
   private final Map<TypeToken<?>, Translator<?>> translators = Maps.newConcurrentMap();
 
   @Inject
-  public PacketTranslation() {}
+  public PacketTranslation() {
+  }
 
   /**
    * Returns a {@link Translator} for the specified {@link TypeToken}

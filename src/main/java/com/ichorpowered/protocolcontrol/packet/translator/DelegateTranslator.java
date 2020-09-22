@@ -22,32 +22,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.ichorpowered.protocolcontrol.packet;
+package com.ichorpowered.protocolcontrol.packet.translator;
 
-import com.ichorpowered.protocolcontrol.event.PacketEvent;
+import com.google.common.reflect.TypeToken;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-/**
- * Represents the direction a packet is traveling.
- */
-public enum PacketDirection {
-  /**
-   * The direction for when a packet is to be sent from the
-   * client to the server.
-   */
-  INCOMING,
+@SuppressWarnings({"unchecked", "UnstableApiUsage"})
+public final class DelegateTranslator<T> implements Translator<T> {
+  private final TypeToken<?> translatable;
 
-  /**
-   * The direction for when a packet is to be sent from the
-   * server to the client.
-   */
-  OUTGOING,
+  public DelegateTranslator(final @NonNull TypeToken<?> translatable) {
+    this.translatable = translatable;
+  }
 
-  /**
-   * The direction is not specified and can be either
-   * {@link PacketDirection#INCOMING} or {@link PacketDirection#OUTGOING}.
-   *
-   * <p>Used as the default when filtering for {@link PacketEvent}s
-   * in a specific direction. This should not be used anywhere else.</p>
-   */
-  UNSPECIFIED
+  @Override
+  public @NonNull TypeToken<?> translatable() {
+    return this.translatable;
+  }
+
+  @Override
+  public @Nullable T wrap(final @Nullable Object object) {
+    return (T) object;
+  }
+
+  @Override
+  public <E> @Nullable E unwrap(final @Nullable T translation) {
+    return (E) translation;
+  }
 }
