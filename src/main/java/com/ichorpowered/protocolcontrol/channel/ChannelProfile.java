@@ -35,7 +35,6 @@ import java.lang.ref.WeakReference;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
-import net.minecraft.network.Packet;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
@@ -108,7 +107,8 @@ public final class ChannelProfile {
    * @param packet the packet
    * @param <T> the packet type
    */
-  public <T extends Packet<?>> void send(final @NonNull PacketDirection direction, final @NonNull T packet) {
+  public <T> void send(final @NonNull PacketDirection direction,
+                       final @NonNull T packet) {
     this.send(direction, packet, false);
   }
 
@@ -122,8 +122,9 @@ public final class ChannelProfile {
    *                      post to the event loop
    * @param <T> the packet type
    */
-  public <T extends Packet<?>> void send(final @NonNull PacketDirection direction, final @NonNull T packet,
-                                         final boolean currentThread) {
+  public <T> void send(final @NonNull PacketDirection direction,
+                       final @NonNull T packet,
+                       final boolean currentThread) {
     if(!this.active || !this.channel.isActive()) return;
     if(direction == PacketDirection.INCOMING) {
       final ChannelHandlerContext context = this.channel.pipeline().context(ProtocolInjector.INCOMING_HANDLER);
@@ -162,7 +163,7 @@ public final class ChannelProfile {
   }
 
   private @NonNull Optional<Player> player(final @NonNull UUID id) {
-    if (!Sponge.isServerAvailable()) return Optional.empty();
+    if(!Sponge.isServerAvailable()) return Optional.empty();
     final Optional<Player> optionalPlayer = Sponge.getServer().getPlayer(id);
     optionalPlayer.ifPresent(value -> this.player = new WeakReference<>(value));
     return optionalPlayer;

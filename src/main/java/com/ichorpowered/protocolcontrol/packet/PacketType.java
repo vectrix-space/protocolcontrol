@@ -137,11 +137,13 @@ import net.minecraft.network.play.server.SPacketWorldBorder;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Represents the {@link PacketDirection#INCOMING} and {@link PacketDirection#OUTGOING}
  * packet types in the game as of version 1.12.2.
  */
-@SuppressWarnings("UnstableApiUsage")
+@SuppressWarnings({"unchecked", "UnstableApiUsage"})
 public enum PacketType {
   ABILITIES(CPacketPlayerAbilities.class, SPacketPlayerAbilities.class),
   ADVANCEMENT_INFO(null, SPacketAdvancementInfo.class),
@@ -257,14 +259,49 @@ public enum PacketType {
     this.outboundType = outboundType;
   }
 
+  /**
+   * Returns the {@link PacketDirection#INCOMING} type.
+   *
+   * @return the incoming type
+   */
   public @Nullable Class<?> inboundType() {
     return this.inboundType;
   }
 
+  /**
+   * Returns the {@link PacketDirection#OUTGOING} type.
+   *
+   * @return the outgoing type
+   */
   public @Nullable Class<?> outboundType() {
     return this.outboundType;
   }
 
+  /**
+   * Creates an instance of the {@code E} packet for the specified
+   * {@link PacketDirection}.
+   *
+   * @param direction the packet direction
+   * @param <E> the packet type
+   * @return the packet
+   * @throws Throwable exceptions if ths specified direction, or the packet
+   *                   type for the specified direction is null, the direction
+   *                   is UNSPECIFIED, or there was a problem attempting to
+   *                   create an instance
+   */
+  public <E> E create(final @NonNull PacketDirection direction) throws Throwable {
+    if(direction == PacketDirection.INCOMING) return (E) requireNonNull(this.inboundType, "inbound").newInstance();
+    if(direction == PacketDirection.OUTGOING) return (E) requireNonNull(this.outboundType, "outbound").newInstance();
+    throw new IllegalArgumentException("PacketDirection cannot be unspecified");
+  }
+
+  /**
+   * Validates that this packet type contains the specified
+   * type.
+   *
+   * @param type the packet type
+   * @return whether the specified type is matching
+   */
   public boolean validate(final @NonNull TypeToken<?> type) {
     return (this.inboundType != null && this.inboundType.equals(type.getRawType()))
       || (this.outboundType != null && this.outboundType.equals(type.getRawType()));
