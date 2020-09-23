@@ -289,7 +289,7 @@ public enum PacketType {
    *                   is UNSPECIFIED, or there was a problem attempting to
    *                   create an instance
    */
-  public <E> E create(final @NonNull PacketDirection direction) throws Throwable {
+  public <E> @NonNull E create(final @NonNull PacketDirection direction) throws Throwable {
     if(direction == PacketDirection.INCOMING) return (E) requireNonNull(this.inboundType, "inbound").newInstance();
     if(direction == PacketDirection.OUTGOING) return (E) requireNonNull(this.outboundType, "outbound").newInstance();
     throw new IllegalArgumentException("PacketDirection cannot be unspecified");

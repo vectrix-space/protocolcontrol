@@ -38,13 +38,6 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 @SuppressWarnings("UnstableApiUsage")
 public interface Translator<T> {
   /**
-   * Returns the translatable {@link TypeToken}.
-   *
-   * @return the translatable type
-   */
-  @NonNull TypeToken<?> translatable();
-
-  /**
    * Wraps the specified object into this {@code T}
    * translation.
    *
@@ -61,4 +54,11 @@ public interface Translator<T> {
    * @return the translatable object
    */
   <E> @Nullable E unwrap(@Nullable T translation);
+
+  /**
+   * Returns the translatable {@link TypeToken}.
+   *
+   * @return the translatable type
+   */
+  @NonNull TypeToken<?> translatable();
 }

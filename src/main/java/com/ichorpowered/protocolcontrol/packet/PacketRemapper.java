@@ -50,7 +50,7 @@ import static java.util.Objects.requireNonNull;
 @Singleton
 @SuppressWarnings({"unchecked", "UnstableApiUsage"})
 public final class PacketRemapper {
-  private final Map<Class<?>, PacketStructure<?>> structures = Maps.newHashMap();
+  private final Map<Class<?>, PacketStructure> structures = Maps.newHashMap();
   private final MethodHandles.Lookup lookup = MethodHandles.lookup();
   private final Logger logger;
   private final PacketTranslation translation;
@@ -66,37 +66,48 @@ public final class PacketRemapper {
    * Returns a {@link PacketStructure} instance of the specified {@code T} packet.
    *
    * @param packet the packet class
-   * @param <T> the packet type
    * @return the packet structure
    */
-  public <T> @NonNull PacketStructure<T> structure(final @NonNull Class<?> packet) {
-    return (PacketStructure<T>) this.structures.computeIfAbsent(requireNonNull(packet, "packet"), key ->
+  public @NonNull PacketStructure structure(final @NonNull Class<?> packet) {
+    return this.structures.computeIfAbsent(requireNonNull(packet, "packet"), key ->
       PacketStructure.generate(this.logger, this.lookup, key));
   }
 
   /**
-   * Returns a {@link Wrapped} instance of the specified {@code T} packet.
+   * Returns a {@link Wrapped} instance of a new packet created
+   * by the specified {@link PacketType} and {@link PacketDirection}.
    *
-   * @param packet the packet
-   * @param <T> the packet type
+   * @param type the packet type
+   * @param direction the packet direction
    * @return the packet wrapper
+   * @throws Throwable exceptions related to creating the packet
    */
-  public <T> @NonNull Wrapped<T> wrap(final @NonNull T packet) {
-    return new Wrapped<>(requireNonNull(packet, "packet"), this.structure(packet.getClass()), this.translation);
+  public @NonNull Wrapped wrap(final @NonNull PacketType type, final @NonNull PacketDirection direction) throws Throwable {
+    final Object packet = requireNonNull(type, "type").create(requireNonNull(direction, "direction"));
+    return this.wrap(packet);
   }
 
   /**
-   * A wrapper containing the {@code T} packet and the specific
-   * {@link PacketStructure} this packet uses.
+   * Returns a {@link Wrapped} instance of the specified packet.
    *
-   * @param <T> the packet type
+   * @param packet the packet
+   * @return the packet wrapper
    */
-  public static final class Wrapped<T> {
-    private final T packet;
-    private final PacketStructure<T> structure;
+  public @NonNull Wrapped wrap(final @NonNull Object packet) {
+    return new Wrapped(requireNonNull(packet, "packet"), this.structure(packet.getClass()), this.translation);
+  }
+
+  /**
+   * A wrapper containing the packet and the specific
+   * {@link PacketStructure} this packet uses.
+   */
+  public static final class Wrapped {
+    private final Object packet;
+    private final PacketStructure structure;
     private final PacketTranslation translation;
 
-    /* package */ Wrapped(final @NonNull T packet, final @NonNull PacketStructure<T> structure,
+    /* package */ Wrapped(final @NonNull Object packet,
+                          final @NonNull PacketStructure structure,
                           final @NonNull PacketTranslation translation) {
       this.packet = requireNonNull(packet, "packet");
       this.structure = requireNonNull(structure, "structure");
@@ -108,7 +119,7 @@ public final class PacketRemapper {
      *
      * @return the packet
      */
-    public @NonNull T packet() {
+    public @NonNull Object packet() {
       return this.packet;
     }
 

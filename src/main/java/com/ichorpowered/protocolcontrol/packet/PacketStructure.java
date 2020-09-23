@@ -45,13 +45,11 @@ import static java.util.Objects.requireNonNull;
  * Represents the structure of the packets data. This provides
  * the {@link MethodHandle}s to extract data from the specified
  * packet without needing to create them every time.
- *
- * @param <T> the packet type
  */
 @SuppressWarnings("UnstableApiUsage")
-public final class PacketStructure<T> {
-  protected static <E> @NonNull PacketStructure<E> generate(final @NonNull Logger logger, final MethodHandles.@NonNull Lookup lookup,
-                                                            final @NonNull Class<E> packet) {
+public final class PacketStructure {
+  protected static @NonNull PacketStructure generate(final @NonNull Logger logger, final MethodHandles.@NonNull Lookup lookup,
+                                                     final @NonNull Class<?> packet) {
     final Map<TypeToken<?>, List<Handle>> handleMap = Maps.newHashMap();
     PacketStructure.find(packet, Class::getSuperclass, fields -> {
       for(final Field field : fields) {
@@ -73,7 +71,7 @@ public final class PacketStructure<T> {
         }
       }
     });
-    return new PacketStructure<>(packet, handleMap);
+    return new PacketStructure(packet, handleMap);
   }
 
   protected static void find(final @NonNull Class<?> search, final @NonNull Function<Class<?>, Class<?>> superSearch,
@@ -86,15 +84,15 @@ public final class PacketStructure<T> {
     }
   }
 
-  private final Class<T> packet;
+  private final Class<?> packet;
   private final Map<TypeToken<?>, List<Handle>> handles;
 
-  /* package */ PacketStructure(final @NonNull Class<T> packet, final @NonNull Map<TypeToken<?>, List<Handle>> handles) {
+  /* package */ PacketStructure(final @NonNull Class<?> packet, final @NonNull Map<TypeToken<?>, List<Handle>> handles) {
     this.packet = packet;
     this.handles = handles;
   }
 
-  public @NonNull Class<T> packet() {
+  public @NonNull Class<?> packet() {
     return this.packet;
   }
 

@@ -37,11 +37,6 @@ public final class DelegateTranslator<T> implements Translator<T> {
   }
 
   @Override
-  public @NonNull TypeToken<?> translatable() {
-    return this.translatable;
-  }
-
-  @Override
   public @Nullable T wrap(final @Nullable Object object) {
     return (T) object;
   }
@@ -49,5 +44,10 @@ public final class DelegateTranslator<T> implements Translator<T> {
   @Override
   public <E> @Nullable E unwrap(final @Nullable T translation) {
     return (E) translation;
+  }
+
+  @Override
+  public @NonNull TypeToken<?> translatable() {
+    return this.translatable;
   }
 }

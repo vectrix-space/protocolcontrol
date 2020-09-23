@@ -24,5 +24,24 @@
  */
 package com.ichorpowered.protocolcontrol.packet.translation;
 
+import org.checkerframework.checker.nullness.qual.NonNull;
+
+/**
+ * Represents a custom type to backed by a translatable type
+ * that is easier to access and modify.
+ */
 public interface Translation {
+  /**
+   * Returns the translatable instance.
+   *
+   * @return the translatable instance
+   */
+  @NonNull Object instance();
+
+  /**
+   * Sets the translatable instance.
+   *
+   * @param instance the translatable instance
+   */
+  void instance(@NonNull Object instance);
 }
