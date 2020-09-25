@@ -26,6 +26,7 @@ package com.ichorpowered.protocolcontrol;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.ichorpowered.protocolcontrol.packet.PacketTranslations;
 import com.ichorpowered.protocolcontrol.service.ProtocolService;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -49,9 +50,10 @@ public final class ProtocolPlugin {
   private final Injector injector;
   private final PluginContainer plugin;
   private final Logger logger;
+  private PacketTranslations packetTranslations;
+  private ProtocolInjector protocolInjector;
   private ProtocolChannel protocolChannel;
   private ProtocolEvent protocolEvent;
-  private ProtocolInjector protocolInjector;
 
   @Inject
   public ProtocolPlugin(final Injector injector,
@@ -65,9 +67,11 @@ public final class ProtocolPlugin {
   @Listener(order = Order.FIRST)
   public void onGameInitialization(final GameInitializationEvent event) {
     final Injector childInjector = this.injector.createChildInjector(new ProtocolModule());
+    this.packetTranslations = childInjector.getInstance(PacketTranslations.class);
+    this.protocolInjector = childInjector.getInstance(ProtocolInjector.class);
     this.protocolChannel = childInjector.getInstance(ProtocolChannel.class);
     this.protocolEvent = childInjector.getInstance(ProtocolEvent.class);
-    this.protocolInjector = childInjector.getInstance(ProtocolInjector.class);
+    this.packetTranslations.register();
     this.protocolInjector.setup();
     this.protocolChannel.enable();
     this.protocolEvent.enable();
