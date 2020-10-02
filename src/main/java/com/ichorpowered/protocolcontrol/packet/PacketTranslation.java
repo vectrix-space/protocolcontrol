@@ -24,11 +24,11 @@
  */
 package com.ichorpowered.protocolcontrol.packet;
 
-import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.ichorpowered.protocolcontrol.packet.translator.Translator;
+import java.util.HashMap;
 import java.util.Map;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -41,7 +41,7 @@ import static java.util.Objects.requireNonNull;
 @Singleton
 @SuppressWarnings({"unchecked", "UnstableApiUsage"})
 public final class PacketTranslation {
-  private final Map<TypeToken<?>, Translator<?>> translators = Maps.newConcurrentMap();
+  private final Map<TypeToken<?>, Translator<?>> translators = new HashMap<>();
 
   @Inject
   public PacketTranslation() {
@@ -68,6 +68,6 @@ public final class PacketTranslation {
    * @param <T> the translation type
    */
   public <T> void translate(final @NonNull TypeToken<T> type, final @NonNull Translator<T> translator) {
-    this.translators.putIfAbsent(requireNonNull(type, "type"), requireNonNull(translator, "translator"));
+    this.translators.put(requireNonNull(type, "type"), requireNonNull(translator, "translator"));
   }
 }

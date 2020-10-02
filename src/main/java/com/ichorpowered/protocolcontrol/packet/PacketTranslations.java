@@ -29,15 +29,14 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.ichorpowered.protocolcontrol.packet.translator.DelegateTranslator;
-import com.ichorpowered.protocolcontrol.packet.translator.type.StringTextTranslator;
+import com.ichorpowered.protocolcontrol.packet.translator.type.ComponentTextTranslator;
 import com.ichorpowered.protocolcontrol.packet.translator.type.Vector3iTranslator;
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumHand;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.type.HandType;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.chat.ChatType;
 
 @Singleton
 @SuppressWarnings("UnstableApiUsage")
@@ -50,10 +49,12 @@ public final class PacketTranslations {
   }
 
   public void register() {
-    this.translation.translate(TypeToken.of(BlockType.class), new DelegateTranslator<>(TypeToken.of(Block.class)));
-    this.translation.translate(TypeToken.of(BlockState.class), new DelegateTranslator<>(TypeToken.of(IBlockState.class)));
-    this.translation.translate(TypeToken.of(HandType.class), new DelegateTranslator<>(TypeToken.of(EnumHand.class)));
-    this.translation.translate(TypeToken.of(Text.class), new StringTextTranslator());
+    this.translation.translate(TypeToken.of(BlockType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.block.Block.class)));
+    this.translation.translate(TypeToken.of(BlockState.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.block.state.IBlockState.class)));
+    this.translation.translate(TypeToken.of(ItemStack.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.item.ItemStack.class)));
+    this.translation.translate(TypeToken.of(HandType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.util.EnumHand.class)));
+    this.translation.translate(TypeToken.of(ChatType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.util.text.ChatType.class)));
+    this.translation.translate(TypeToken.of(Text.class), new ComponentTextTranslator());
     this.translation.translate(TypeToken.of(Vector3i.class), new Vector3iTranslator());
   }
 }

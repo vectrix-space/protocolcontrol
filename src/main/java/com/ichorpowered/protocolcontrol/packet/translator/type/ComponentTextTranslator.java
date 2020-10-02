@@ -26,29 +26,30 @@ package com.ichorpowered.protocolcontrol.packet.translator.type;
 
 import com.google.common.reflect.TypeToken;
 import com.ichorpowered.protocolcontrol.packet.translator.Translator;
+import net.minecraft.util.text.ITextComponent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.common.text.SpongeTexts;
 
 @SuppressWarnings({"unchecked", "UnstableApiUsage"})
-public final class StringTextTranslator implements Translator<Text> {
+public final class ComponentTextTranslator implements Translator<Text> {
   @Override
   public @Nullable Text wrap(final @Nullable Object object) {
     if(object == null) return null;
-    final String message = (String) object;
-    return TextSerializers.LEGACY_FORMATTING_CODE.deserialize(message);
+    final ITextComponent message = (ITextComponent) object;
+    return SpongeTexts.toText(message);
   }
 
   @Override
   public <E> @Nullable E unwrap(final @Nullable Text translation) {
     if(translation == null) return null;
-    final String message = TextSerializers.LEGACY_FORMATTING_CODE.serialize(translation);
+    final ITextComponent message = SpongeTexts.toComponent(translation);
     return (E) message;
   }
 
   @Override
   public @NonNull TypeToken<?> translatable() {
-    return TypeToken.of(String.class);
+    return TypeToken.of(ITextComponent.class);
   }
 }
