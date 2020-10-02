@@ -24,8 +24,8 @@
  */
 package com.ichorpowered.protocolcontrol.util;
 
+import com.ichorpowered.indigo.DetailedReport;
 import java.util.function.Consumer;
-import net.kyori.indigo.DetailedReport;
 import net.kyori.mu.function.ThrowingRunnable;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
