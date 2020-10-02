@@ -33,10 +33,19 @@ import com.ichorpowered.protocolcontrol.packet.translator.type.ComponentTextTran
 import com.ichorpowered.protocolcontrol.packet.translator.type.Vector3iTranslator;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.data.type.HandType;
+import org.spongepowered.api.effect.particle.ParticleType;
+import org.spongepowered.api.effect.sound.SoundCategory;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.equipment.EquipmentType;
+import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatType;
+import org.spongepowered.api.text.chat.ChatVisibility;
+import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.difficulty.Difficulty;
 
 @Singleton
 @SuppressWarnings("UnstableApiUsage")
@@ -53,7 +62,16 @@ public final class PacketTranslations {
     this.translation.translate(TypeToken.of(BlockState.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.block.state.IBlockState.class)));
     this.translation.translate(TypeToken.of(ItemStack.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.item.ItemStack.class)));
     this.translation.translate(TypeToken.of(HandType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.util.EnumHand.class)));
+    this.translation.translate(TypeToken.of(HandPreference.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.util.EnumHandSide.class)));
     this.translation.translate(TypeToken.of(ChatType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.util.text.ChatType.class)));
+    this.translation.translate(TypeToken.of(ChatVisibility.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.entity.player.EntityPlayer.EnumChatVisibility.class)));
+    this.translation.translate(TypeToken.of(EquipmentType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.inventory.EntityEquipmentSlot.class)));
+    this.translation.translate(TypeToken.of(SoundCategory.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.util.SoundCategory.class)));
+    this.translation.translate(TypeToken.of(GameMode.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.world.GameType.class)));
+    this.translation.translate(TypeToken.of(Difficulty.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.world.EnumDifficulty.class)));
+    this.translation.translate(TypeToken.of(GeneratorType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.world.WorldType.class)));
+    this.translation.translate(TypeToken.of(GameProfile.class), new DelegateTranslator<>(TypeToken.of(com.mojang.authlib.GameProfile.class)));
+    this.translation.translate(TypeToken.of(ParticleType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.util.EnumParticleTypes.class)));
     this.translation.translate(TypeToken.of(Text.class), new ComponentTextTranslator());
     this.translation.translate(TypeToken.of(Vector3i.class), new Vector3iTranslator());
   }
