@@ -1,5 +1,6 @@
 Protocol Control
 ================
+![build](https://github.com/ichorpowered/protocolcontrol/workflows/build/badge.svg)
 
 **Under development and not stable!**
 
