@@ -51,9 +51,9 @@ license {
 }
 
 dependencies {
+  compile "com.ichorpowered:indigo:1.0.0-SNAPSHOT"
   compile "net.kyori:mu:1.0.0-SNAPSHOT"
   compile "net.kyori:violet:1.2.0-SNAPSHOT"
-  compile "net.kyori:indigo:1.0.0-SNAPSHOT"
   compile "net.kyori:event-method-asm:4.0.0-SNAPSHOT"
   compileOnly "org.spongepowered:spongeapi:7.3.0"
   compileOnly "org.spongepowered:spongecommon:1.12.2-7.3.0:dev"
