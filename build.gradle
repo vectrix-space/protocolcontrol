@@ -12,18 +12,19 @@ buildscript {
 }
 
 plugins {
-  id "net.minecrell.licenser" version "0.4"
-  id "com.github.johnrengelman.shadow" version "5.2.0"
-  id "org.spongepowered.plugin" version "0.9.0"
-  id "net.minecrell.vanillagradle.server" version "2.2-6"
-  id "java-library"
+  id "java"
   id "maven-publish"
+  id "net.minecrell.licenser" version "0.4.1"
+  id "com.github.johnrengelman.shadow" version "5.2.0"
+  id "net.minecrell.vanillagradle.server" version "2.2-6"
+  id "org.spongepowered.plugin" version "0.9.0"
 }
 
-sponge.plugin.id = pluginId
+group = "com.ichorpowered"
+version = "0.1.0-SNAPSHOT"
+description = "A minimal packet manipulation library for Sponge."
 
-group = pluginGroup
-version = pluginVersion
+sponge.plugin.id = project.name
 
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
@@ -38,7 +39,7 @@ repositories {
 }
 
 license {
-  header = file("HEADER.txt")
+  header = file("header.txt")
   newLine = false
   ext {
     name = "ProtocolControl"
@@ -50,11 +51,12 @@ license {
 }
 
 dependencies {
-  compile 'net.kyori:mu:1.0.0-SNAPSHOT'
-  compile 'net.kyori:violet:1.2.0-SNAPSHOT'
-  compile 'net.kyori:indigo:1.0.0-SNAPSHOT'
+  compile "net.kyori:mu:1.0.0-SNAPSHOT"
+  compile "net.kyori:violet:1.2.0-SNAPSHOT"
+  compile "net.kyori:indigo:1.0.0-SNAPSHOT"
   compile "net.kyori:event-method-asm:4.0.0-SNAPSHOT"
   compileOnly "org.spongepowered:spongeapi:7.3.0"
+  compileOnly "org.spongepowered:spongecommon:1.12.2-7.3.0:dev"
   annotationProcessor "org.spongepowered:spongeapi:7.3.0"
 }
 
@@ -111,16 +113,16 @@ shadowJar {
   dependsOn reobfJar
 
   dependencies {
-    include(dependency('net.kyori:mu'))
-    include(dependency('net.kyori:violet'))
-    include(dependency('net.kyori:indigo'))
+    include(dependency("net.kyori:mu"))
+    include(dependency("net.kyori:violet"))
+    include(dependency("net.kyori:indigo"))
     include(dependency("net.kyori:event-api"))
     include(dependency("net.kyori:event-method"))
     include(dependency("net.kyori:event-method-asm"))
-    include(dependency('net.kyori:examination-api'))
+    include(dependency("net.kyori:examination-api"))
 
-    include(dependency('com.google.inject.extensions:guice-assistedinject'))
-    include(dependency('com.google.inject.extensions:guice-multibindings'))
+    include(dependency("com.google.inject.extensions:guice-assistedinject"))
+    include(dependency("com.google.inject.extensions:guice-multibindings"))
   }
 
   relocate("net.kyori", "com.ichorpowered.protocolcontrol.lib.kyori")
@@ -160,16 +162,16 @@ publishing {
   }
   publications {
     mavenJava(MavenPublication) {
-      artifactId = 'protocolcontrol'
       from components.java
+
       artifact shadowJar
       artifact sourcesJar
       artifact javadocsJar
 
       pom {
-        name = "protocolcontrol"
-        description = "A minimal packet manipulation library for Sponge."
+        name = project.name
         url = "https://github.com/ichorpowered/protocolcontrol"
+        description = project.description
 
         licenses {
           license {

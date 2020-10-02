@@ -1,0 +1,27 @@
+name: "publish"
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: "checkout repository"
+        uses: "actions/checkout@v2"
+      - name: "setup jdk"
+        uses: "actions/setup-java@v1"
+        with:
+          java-version: "1.8"
+          server-id: "github"
+          settings-path: "${{ github.workspace }}"
+      - name: "set permissions"
+        run: "chmod +x gradlew"
+      - name: "build and publish"
+        run: "./gradlew build publish"
+        env:
+          GITHUB_USERNAME: "${{ github.actor }}"
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          ICHORPOWERED_USERNAME: "${{ secrets.ICHORPOWERED_USERNAME }}"
+          ICHORPOWERED_PASSWORD: "${{ secrets.ICHORPOWERED_PASSWORD }}"
