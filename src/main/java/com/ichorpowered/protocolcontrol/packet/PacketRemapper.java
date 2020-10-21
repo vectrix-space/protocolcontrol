@@ -136,10 +136,10 @@ public final class PacketRemapper {
      *                   translator, locate or parse the field
      *                   or the fields element
      */
-    public <E> @Nullable E translateGet(final @NonNull TypeToken<E> type, final int index) throws Throwable {
+    public <E> @Nullable E get(final @NonNull TypeToken<E> type, final int index) throws Throwable {
       final Translator<E> translator = this.translation.translate(type);
-      if(translator == null) throw new IllegalStateException("Unable to locate translator");
-      final Object field = this.get(translator.translatable(), index);
+      if(translator == null) return this.getRaw(type, index);
+      final Object field = this.getRaw(translator.translatable(), index);
       return translator.wrap(field);
     }
 
@@ -155,7 +155,7 @@ public final class PacketRemapper {
      * @throws Throwable exceptions attempting to locate or parse
      *                   the field or the fields element
      */
-    public <E> @Nullable E get(final @NonNull TypeToken<E> type, final int index) throws Throwable {
+    public <E> @Nullable E getRaw(final @NonNull TypeToken<E> type, final int index) throws Throwable {
       final MethodHandle handle = this.structure.getter(requireNonNull(type, "type"), index);
       if(handle == null) throw new IllegalStateException("Unable to locate method handle");
       final Object field = handle.invoke(this.packet());
@@ -174,7 +174,7 @@ public final class PacketRemapper {
      * @throws Throwable exceptions attempting to locate or parse
      *                   the field or the fields element
      */
-    public <E> @Nullable E get(final @NonNull Class<E> type, final int index) throws Throwable {
+    public <E> @Nullable E getRaw(final @NonNull Class<E> type, final int index) throws Throwable {
       final MethodHandle handle = this.structure.getter(requireNonNull(type, "type"), index);
       if(handle == null) throw new IllegalStateException("Unable to locate method handle");
       final Object field = handle.invoke(this.packet());
@@ -193,10 +193,10 @@ public final class PacketRemapper {
      * @throws Throwable exceptions attempting to locate the
      *                   translator or locate the field
      */
-    public <E> void translateSet(final @NonNull TypeToken<E> type, final int index, final @Nullable E value) throws Throwable {
+    public <E> void set(final @NonNull TypeToken<E> type, final int index, final @Nullable E value) throws Throwable {
       final Translator<E> translator = this.translation.translate(type);
       if(translator == null) throw new IllegalStateException("Unable to locate translator");
-      this.set(translator.translatable(), index, translator.unwrap(value));
+      this.setRaw(translator.translatable(), index, translator.unwrap(value));
     }
 
     /**
@@ -210,7 +210,7 @@ public final class PacketRemapper {
      * @param <E> the element type
      * @throws Throwable exceptions attempting to locate the field
      */
-    public <E> void set(final @NonNull TypeToken<E> type, final int index, final @Nullable E value) throws Throwable {
+    public <E> void setRaw(final @NonNull TypeToken<E> type, final int index, final @Nullable E value) throws Throwable {
       final MethodHandle handle = this.structure.setter(requireNonNull(type, "type"), index);
       if(handle == null) throw new IllegalStateException("Unable to locate method handle");
       handle.invoke(this.packet(), value);
@@ -227,7 +227,7 @@ public final class PacketRemapper {
      * @param <E> the element type
      * @throws Throwable exceptions attempting to locate the field
      */
-    public <E> void set(final @NonNull Class<E> type, final int index, final @Nullable E value) throws Throwable {
+    public <E> void setRaw(final @NonNull Class<E> type, final int index, final @Nullable E value) throws Throwable {
       final MethodHandle handle = this.structure.setter(requireNonNull(type, "type"), index);
       if(handle == null) throw new IllegalStateException("Unable to locate method handle");
       handle.invoke(this.packet(), value);

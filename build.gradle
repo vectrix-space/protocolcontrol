@@ -113,9 +113,10 @@ shadowJar {
   dependsOn reobfJar
 
   dependencies {
+    include(dependency("com.ichorpowered:indigo"))
+
     include(dependency("net.kyori:mu"))
     include(dependency("net.kyori:violet"))
-    include(dependency("net.kyori:indigo"))
     include(dependency("net.kyori:event-api"))
     include(dependency("net.kyori:event-method"))
     include(dependency("net.kyori:event-method-asm"))
@@ -125,6 +126,7 @@ shadowJar {
     include(dependency("com.google.inject.extensions:guice-multibindings"))
   }
 
+  relocate("com.ichorpowered.indigo", "com.ichorpowered.indigo.lib.indigo")
   relocate("net.kyori", "com.ichorpowered.protocolcontrol.lib.kyori")
 
   exclude "dummyThing"

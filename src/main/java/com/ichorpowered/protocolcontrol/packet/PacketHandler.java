@@ -110,7 +110,7 @@ public final class PacketHandler extends ChannelDuplexHandler {
       () -> {
         if(message instanceof SPacketLoginSuccess) {
           final PacketRemapper.Wrapped wrapped = this.remapper.wrap(message);
-          final GameProfile profile = wrapped.get(GameProfile.class, 0);
+          final GameProfile profile = wrapped.getRaw(GameProfile.class, 0);
           if(profile != null) {
             this.profile.id(profile.getId());
             this.channels.add(this.profile);
