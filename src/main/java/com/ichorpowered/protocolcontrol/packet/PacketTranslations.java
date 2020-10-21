@@ -28,8 +28,10 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.ichorpowered.protocolcontrol.packet.translation.type.ResourceKey;
 import com.ichorpowered.protocolcontrol.packet.translator.DelegateTranslator;
 import com.ichorpowered.protocolcontrol.packet.translator.type.ComponentTextTranslator;
+import com.ichorpowered.protocolcontrol.packet.translator.type.ResourceKeyTranslator;
 import com.ichorpowered.protocolcontrol.packet.translator.type.Vector3iTranslator;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -80,6 +82,7 @@ public final class PacketTranslations {
     this.translation.translate(TypeToken.of(PotionEffectType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.potion.Potion.class)));
     this.translation.translate(TypeToken.of(BossBarColor.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.world.BossInfo.Color.class)));
     this.translation.translate(TypeToken.of(BossBarOverlay.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.world.BossInfo.Overlay.class)));
+    this.translation.translate(TypeToken.of(ResourceKey.class), new ResourceKeyTranslator());
     this.translation.translate(TypeToken.of(Text.class), new ComponentTextTranslator());
     this.translation.translate(TypeToken.of(Vector3i.class), new Vector3iTranslator());
   }
