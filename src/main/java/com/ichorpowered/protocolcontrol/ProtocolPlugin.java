@@ -28,24 +28,18 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.ichorpowered.protocolcontrol.packet.PacketTranslations;
 import com.ichorpowered.protocolcontrol.service.ProtocolService;
-import org.slf4j.Logger;
-import org.spongepowered.api.Sponge;
+import com.ichorpowered.protocolcontrol.service.ServiceProvider;
+import org.apache.logging.log4j.Logger;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
-import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.event.lifecycle.ConstructPluginEvent;
+import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
+import org.spongepowered.api.event.lifecycle.StoppingEngineEvent;
+import org.spongepowered.plugin.PluginContainer;
+import org.spongepowered.plugin.builtin.jvm.Plugin;
 
-@Plugin(
-  id = "protocolcontrol",
-  name = "ProtocolControl",
-  description = "A minimal protocol manipulation library for Sponge.",
-  authors = {
-    "Vectrix"
-  }
-)
+@Plugin("protocolcontrol")
 public final class ProtocolPlugin {
   private final Injector injector;
   private final PluginContainer plugin;
@@ -65,31 +59,32 @@ public final class ProtocolPlugin {
   }
 
   @Listener(order = Order.FIRST)
-  public void onGameInitialization(final GameInitializationEvent event) {
+  public void onGameInitialization(final ConstructPluginEvent event) {
     final Injector childInjector = this.injector.createChildInjector(new ProtocolModule());
     this.packetTranslations = childInjector.getInstance(PacketTranslations.class);
     this.protocolInjector = childInjector.getInstance(ProtocolInjector.class);
     this.protocolChannel = childInjector.getInstance(ProtocolChannel.class);
     this.protocolEvent = childInjector.getInstance(ProtocolEvent.class);
+    final ProtocolService protocolService = childInjector.getInstance(ProtocolService.class);
+    ServiceProvider.register(protocolService);
+  }
+
+  @Listener(order = Order.FIRST)
+  public void onGameStarting(final StartingEngineEvent<Server> event) {
     this.packetTranslations.register();
     this.protocolInjector.setup();
     this.protocolChannel.enable();
     this.protocolEvent.enable();
-    final ProtocolService protocolService = childInjector.getInstance(ProtocolService.class);
-    Sponge.getServiceManager().setProvider(this, ProtocolService.class, protocolService);
-  }
 
-  @Listener(order = Order.FIRST)
-  public void onGameStarting(final GamePostInitializationEvent event) {
     this.protocolInjector.enable();
-    this.logger.info("Successfully injected " + this.plugin.getName() + " version " + this.plugin.getVersion().orElse("UNKNOWN"));
+    this.logger.info("Successfully injected " + this.plugin.metadata().name().orElse("Unknown") + " version " + this.plugin.metadata().version());
   }
 
   @Listener(order = Order.LAST)
-  public void onGameStopped(final GameStoppingServerEvent event) {
+  public void onGameStopped(final StoppingEngineEvent<Server> event) {
     if(this.protocolInjector != null && this.protocolInjector.enabled()) this.protocolInjector.disable();
     if(this.protocolEvent != null && this.protocolEvent.enabled()) this.protocolEvent.disable();
     if(this.protocolChannel != null && this.protocolChannel.enabled()) this.protocolChannel.disable();
-    this.logger.info("Stopped " + this.plugin.getName());
+    this.logger.info("Stopped " + this.plugin.metadata().name().orElse("Unknown"));
   }
 }

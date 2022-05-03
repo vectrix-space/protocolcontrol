@@ -22,33 +22,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.ichorpowered.protocolcontrol.packet.translator.type;
+package com.ichorpowered.protocolcontrol.service;
 
-import com.google.common.reflect.TypeToken;
-import com.ichorpowered.protocolcontrol.packet.translator.Translator;
-import net.minecraft.util.math.BlockPos;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.math.vector.Vector3i;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
 
-@SuppressWarnings({"unchecked", "UnstableApiUsage"})
-public final class Vector3iTranslator implements Translator<Vector3i> {
-  @Override
-  public @Nullable Vector3i wrap(final @Nullable Object object) {
-    if(object == null) return null;
-    final BlockPos blockPos = (BlockPos) object;
-    return new Vector3i(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+public class ServiceProvider {
+
+  private static @MonotonicNonNull ProtocolService instance;
+
+  public static ProtocolService get() {
+    if(instance == null) {
+      throw new IllegalStateException("The Protocol Service has not yet been initialized!");
+    }
+
+    return instance;
   }
 
-  @Override
-  public <E> @Nullable E unwrap(final @Nullable Vector3i translation) {
-    if(translation == null) return null;
-    final BlockPos blockPos = new BlockPos(translation.x(), translation.y(), translation.z());
-    return (E) blockPos;
+  public static void register(ProtocolService instance) {
+    if(ServiceProvider.instance != null) {
+      throw new IllegalStateException("The protocol service can only be registered once!");
+    }
+
+    ServiceProvider.instance = instance;
   }
 
-  @Override
-  public @NonNull TypeToken<?> translatable() {
-    return TypeToken.of(BlockPos.class);
-  }
 }

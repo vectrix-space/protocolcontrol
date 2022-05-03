@@ -25,115 +25,141 @@
 package com.ichorpowered.protocolcontrol.packet;
 
 import com.google.common.reflect.TypeToken;
-import net.minecraft.network.login.client.CPacketLoginStart;
-import net.minecraft.network.login.server.SPacketLoginSuccess;
-import net.minecraft.network.play.client.CPacketAnimation;
-import net.minecraft.network.play.client.CPacketChatMessage;
-import net.minecraft.network.play.client.CPacketClickWindow;
-import net.minecraft.network.play.client.CPacketClientSettings;
-import net.minecraft.network.play.client.CPacketClientStatus;
-import net.minecraft.network.play.client.CPacketCloseWindow;
-import net.minecraft.network.play.client.CPacketConfirmTeleport;
-import net.minecraft.network.play.client.CPacketConfirmTransaction;
-import net.minecraft.network.play.client.CPacketCreativeInventoryAction;
-import net.minecraft.network.play.client.CPacketCustomPayload;
-import net.minecraft.network.play.client.CPacketEnchantItem;
-import net.minecraft.network.play.client.CPacketEntityAction;
-import net.minecraft.network.play.client.CPacketHeldItemChange;
-import net.minecraft.network.play.client.CPacketInput;
-import net.minecraft.network.play.client.CPacketKeepAlive;
-import net.minecraft.network.play.client.CPacketPlaceRecipe;
-import net.minecraft.network.play.client.CPacketPlayer;
-import net.minecraft.network.play.client.CPacketPlayerAbilities;
-import net.minecraft.network.play.client.CPacketPlayerDigging;
-import net.minecraft.network.play.client.CPacketPlayerTryUseItem;
-import net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock;
-import net.minecraft.network.play.client.CPacketRecipeInfo;
-import net.minecraft.network.play.client.CPacketResourcePackStatus;
-import net.minecraft.network.play.client.CPacketSeenAdvancements;
-import net.minecraft.network.play.client.CPacketSpectate;
-import net.minecraft.network.play.client.CPacketSteerBoat;
-import net.minecraft.network.play.client.CPacketTabComplete;
-import net.minecraft.network.play.client.CPacketUpdateSign;
-import net.minecraft.network.play.client.CPacketUseEntity;
-import net.minecraft.network.play.client.CPacketVehicleMove;
-import net.minecraft.network.play.server.SPacketAdvancementInfo;
-import net.minecraft.network.play.server.SPacketAnimation;
-import net.minecraft.network.play.server.SPacketBlockAction;
-import net.minecraft.network.play.server.SPacketBlockBreakAnim;
-import net.minecraft.network.play.server.SPacketBlockChange;
-import net.minecraft.network.play.server.SPacketCamera;
-import net.minecraft.network.play.server.SPacketChangeGameState;
-import net.minecraft.network.play.server.SPacketChat;
-import net.minecraft.network.play.server.SPacketChunkData;
-import net.minecraft.network.play.server.SPacketCloseWindow;
-import net.minecraft.network.play.server.SPacketCollectItem;
-import net.minecraft.network.play.server.SPacketCombatEvent;
-import net.minecraft.network.play.server.SPacketConfirmTransaction;
-import net.minecraft.network.play.server.SPacketCooldown;
-import net.minecraft.network.play.server.SPacketCustomPayload;
-import net.minecraft.network.play.server.SPacketCustomSound;
-import net.minecraft.network.play.server.SPacketDestroyEntities;
-import net.minecraft.network.play.server.SPacketDisconnect;
-import net.minecraft.network.play.server.SPacketDisplayObjective;
-import net.minecraft.network.play.server.SPacketEffect;
-import net.minecraft.network.play.server.SPacketEntity;
-import net.minecraft.network.play.server.SPacketEntityAttach;
-import net.minecraft.network.play.server.SPacketEntityEffect;
-import net.minecraft.network.play.server.SPacketEntityEquipment;
-import net.minecraft.network.play.server.SPacketEntityHeadLook;
-import net.minecraft.network.play.server.SPacketEntityMetadata;
-import net.minecraft.network.play.server.SPacketEntityProperties;
-import net.minecraft.network.play.server.SPacketEntityStatus;
-import net.minecraft.network.play.server.SPacketEntityTeleport;
-import net.minecraft.network.play.server.SPacketEntityVelocity;
-import net.minecraft.network.play.server.SPacketExplosion;
-import net.minecraft.network.play.server.SPacketHeldItemChange;
-import net.minecraft.network.play.server.SPacketJoinGame;
-import net.minecraft.network.play.server.SPacketKeepAlive;
-import net.minecraft.network.play.server.SPacketMaps;
-import net.minecraft.network.play.server.SPacketMoveVehicle;
-import net.minecraft.network.play.server.SPacketMultiBlockChange;
-import net.minecraft.network.play.server.SPacketOpenWindow;
-import net.minecraft.network.play.server.SPacketParticles;
-import net.minecraft.network.play.server.SPacketPlaceGhostRecipe;
-import net.minecraft.network.play.server.SPacketPlayerAbilities;
-import net.minecraft.network.play.server.SPacketPlayerListHeaderFooter;
-import net.minecraft.network.play.server.SPacketPlayerListItem;
-import net.minecraft.network.play.server.SPacketPlayerPosLook;
-import net.minecraft.network.play.server.SPacketRecipeBook;
-import net.minecraft.network.play.server.SPacketRemoveEntityEffect;
-import net.minecraft.network.play.server.SPacketResourcePackSend;
-import net.minecraft.network.play.server.SPacketRespawn;
-import net.minecraft.network.play.server.SPacketScoreboardObjective;
-import net.minecraft.network.play.server.SPacketSelectAdvancementsTab;
-import net.minecraft.network.play.server.SPacketServerDifficulty;
-import net.minecraft.network.play.server.SPacketSetExperience;
-import net.minecraft.network.play.server.SPacketSetPassengers;
-import net.minecraft.network.play.server.SPacketSetSlot;
-import net.minecraft.network.play.server.SPacketSignEditorOpen;
-import net.minecraft.network.play.server.SPacketSoundEffect;
-import net.minecraft.network.play.server.SPacketSpawnExperienceOrb;
-import net.minecraft.network.play.server.SPacketSpawnGlobalEntity;
-import net.minecraft.network.play.server.SPacketSpawnMob;
-import net.minecraft.network.play.server.SPacketSpawnObject;
-import net.minecraft.network.play.server.SPacketSpawnPainting;
-import net.minecraft.network.play.server.SPacketSpawnPlayer;
-import net.minecraft.network.play.server.SPacketSpawnPosition;
-import net.minecraft.network.play.server.SPacketStatistics;
-import net.minecraft.network.play.server.SPacketTabComplete;
-import net.minecraft.network.play.server.SPacketTeams;
-import net.minecraft.network.play.server.SPacketTimeUpdate;
-import net.minecraft.network.play.server.SPacketTitle;
-import net.minecraft.network.play.server.SPacketUnloadChunk;
-import net.minecraft.network.play.server.SPacketUpdateBossInfo;
-import net.minecraft.network.play.server.SPacketUpdateHealth;
-import net.minecraft.network.play.server.SPacketUpdateScore;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
-import net.minecraft.network.play.server.SPacketUseBed;
-import net.minecraft.network.play.server.SPacketWindowItems;
-import net.minecraft.network.play.server.SPacketWindowProperty;
-import net.minecraft.network.play.server.SPacketWorldBorder;
+import net.minecraft.network.login.client.CCustomPayloadLoginPacket;
+import net.minecraft.network.login.server.SCustomPayloadLoginPacket;
+import net.minecraft.network.login.server.SDisconnectLoginPacket;
+import net.minecraft.network.play.client.CAnimateHandPacket;
+import net.minecraft.network.play.client.CChatMessagePacket;
+import net.minecraft.network.play.client.CClickWindowPacket;
+import net.minecraft.network.play.client.CClientSettingsPacket;
+import net.minecraft.network.play.client.CClientStatusPacket;
+import net.minecraft.network.play.client.CCloseWindowPacket;
+import net.minecraft.network.play.client.CConfirmTeleportPacket;
+import net.minecraft.network.play.client.CConfirmTransactionPacket;
+import net.minecraft.network.play.client.CCreativeInventoryActionPacket;
+import net.minecraft.network.play.client.CCustomPayloadPacket;
+import net.minecraft.network.play.client.CEditBookPacket;
+import net.minecraft.network.play.client.CEnchantItemPacket;
+import net.minecraft.network.play.client.CEntityActionPacket;
+import net.minecraft.network.play.client.CHeldItemChangePacket;
+import net.minecraft.network.play.client.CInputPacket;
+import net.minecraft.network.play.client.CJigsawBlockGeneratePacket;
+import net.minecraft.network.play.client.CKeepAlivePacket;
+import net.minecraft.network.play.client.CLockDifficultyPacket;
+import net.minecraft.network.play.client.CMarkRecipeSeenPacket;
+import net.minecraft.network.play.client.CMoveVehiclePacket;
+import net.minecraft.network.play.client.CPickItemPacket;
+import net.minecraft.network.play.client.CPlaceRecipePacket;
+import net.minecraft.network.play.client.CPlayerAbilitiesPacket;
+import net.minecraft.network.play.client.CPlayerDiggingPacket;
+import net.minecraft.network.play.client.CPlayerPacket;
+import net.minecraft.network.play.client.CPlayerTryUseItemOnBlockPacket;
+import net.minecraft.network.play.client.CPlayerTryUseItemPacket;
+import net.minecraft.network.play.client.CQueryEntityNBTPacket;
+import net.minecraft.network.play.client.CRenameItemPacket;
+import net.minecraft.network.play.client.CResourcePackStatusPacket;
+import net.minecraft.network.play.client.CSeenAdvancementsPacket;
+import net.minecraft.network.play.client.CSelectTradePacket;
+import net.minecraft.network.play.client.CSetDifficultyPacket;
+import net.minecraft.network.play.client.CSpectatePacket;
+import net.minecraft.network.play.client.CSteerBoatPacket;
+import net.minecraft.network.play.client.CTabCompletePacket;
+import net.minecraft.network.play.client.CUpdateBeaconPacket;
+import net.minecraft.network.play.client.CUpdateCommandBlockPacket;
+import net.minecraft.network.play.client.CUpdateJigsawBlockPacket;
+import net.minecraft.network.play.client.CUpdateMinecartCommandBlockPacket;
+import net.minecraft.network.play.client.CUpdateRecipeBookStatusPacket;
+import net.minecraft.network.play.client.CUpdateSignPacket;
+import net.minecraft.network.play.client.CUpdateStructureBlockPacket;
+import net.minecraft.network.play.client.CUseEntityPacket;
+import net.minecraft.network.play.server.SAdvancementInfoPacket;
+import net.minecraft.network.play.server.SAnimateBlockBreakPacket;
+import net.minecraft.network.play.server.SAnimateHandPacket;
+import net.minecraft.network.play.server.SBlockActionPacket;
+import net.minecraft.network.play.server.SCameraPacket;
+import net.minecraft.network.play.server.SChangeBlockPacket;
+import net.minecraft.network.play.server.SChangeGameStatePacket;
+import net.minecraft.network.play.server.SChatPacket;
+import net.minecraft.network.play.server.SChunkDataPacket;
+import net.minecraft.network.play.server.SCloseWindowPacket;
+import net.minecraft.network.play.server.SCollectItemPacket;
+import net.minecraft.network.play.server.SCombatPacket;
+import net.minecraft.network.play.server.SCommandListPacket;
+import net.minecraft.network.play.server.SConfirmTransactionPacket;
+import net.minecraft.network.play.server.SCooldownPacket;
+import net.minecraft.network.play.server.SCustomPayloadPlayPacket;
+import net.minecraft.network.play.server.SDestroyEntitiesPacket;
+import net.minecraft.network.play.server.SDisconnectPacket;
+import net.minecraft.network.play.server.SDisplayObjectivePacket;
+import net.minecraft.network.play.server.SEntityEquipmentPacket;
+import net.minecraft.network.play.server.SEntityHeadLookPacket;
+import net.minecraft.network.play.server.SEntityMetadataPacket;
+import net.minecraft.network.play.server.SEntityPacket;
+import net.minecraft.network.play.server.SEntityPropertiesPacket;
+import net.minecraft.network.play.server.SEntityStatusPacket;
+import net.minecraft.network.play.server.SEntityTeleportPacket;
+import net.minecraft.network.play.server.SEntityVelocityPacket;
+import net.minecraft.network.play.server.SExplosionPacket;
+import net.minecraft.network.play.server.SHeldItemChangePacket;
+import net.minecraft.network.play.server.SJoinGamePacket;
+import net.minecraft.network.play.server.SKeepAlivePacket;
+import net.minecraft.network.play.server.SMapDataPacket;
+import net.minecraft.network.play.server.SMerchantOffersPacket;
+import net.minecraft.network.play.server.SMountEntityPacket;
+import net.minecraft.network.play.server.SMoveVehiclePacket;
+import net.minecraft.network.play.server.SMultiBlockChangePacket;
+import net.minecraft.network.play.server.SOpenBookWindowPacket;
+import net.minecraft.network.play.server.SOpenHorseWindowPacket;
+import net.minecraft.network.play.server.SOpenSignMenuPacket;
+import net.minecraft.network.play.server.SOpenWindowPacket;
+import net.minecraft.network.play.server.SPlaceGhostRecipePacket;
+import net.minecraft.network.play.server.SPlayEntityEffectPacket;
+import net.minecraft.network.play.server.SPlaySoundEffectPacket;
+import net.minecraft.network.play.server.SPlaySoundEventPacket;
+import net.minecraft.network.play.server.SPlaySoundPacket;
+import net.minecraft.network.play.server.SPlayerAbilitiesPacket;
+import net.minecraft.network.play.server.SPlayerDiggingPacket;
+import net.minecraft.network.play.server.SPlayerListHeaderFooterPacket;
+import net.minecraft.network.play.server.SPlayerListItemPacket;
+import net.minecraft.network.play.server.SPlayerLookPacket;
+import net.minecraft.network.play.server.SPlayerPositionLookPacket;
+import net.minecraft.network.play.server.SQueryNBTResponsePacket;
+import net.minecraft.network.play.server.SRecipeBookPacket;
+import net.minecraft.network.play.server.SRemoveEntityEffectPacket;
+import net.minecraft.network.play.server.SRespawnPacket;
+import net.minecraft.network.play.server.SScoreboardObjectivePacket;
+import net.minecraft.network.play.server.SSelectAdvancementsTabPacket;
+import net.minecraft.network.play.server.SSendResourcePackPacket;
+import net.minecraft.network.play.server.SServerDifficultyPacket;
+import net.minecraft.network.play.server.SSetExperiencePacket;
+import net.minecraft.network.play.server.SSetPassengersPacket;
+import net.minecraft.network.play.server.SSetSlotPacket;
+import net.minecraft.network.play.server.SSpawnExperienceOrbPacket;
+import net.minecraft.network.play.server.SSpawnMobPacket;
+import net.minecraft.network.play.server.SSpawnMovingSoundEffectPacket;
+import net.minecraft.network.play.server.SSpawnObjectPacket;
+import net.minecraft.network.play.server.SSpawnPaintingPacket;
+import net.minecraft.network.play.server.SSpawnParticlePacket;
+import net.minecraft.network.play.server.SSpawnPlayerPacket;
+import net.minecraft.network.play.server.SStatisticsPacket;
+import net.minecraft.network.play.server.SStopSoundPacket;
+import net.minecraft.network.play.server.STabCompletePacket;
+import net.minecraft.network.play.server.STagsListPacket;
+import net.minecraft.network.play.server.STeamsPacket;
+import net.minecraft.network.play.server.STitlePacket;
+import net.minecraft.network.play.server.SUnloadChunkPacket;
+import net.minecraft.network.play.server.SUpdateChunkPositionPacket;
+import net.minecraft.network.play.server.SUpdateHealthPacket;
+import net.minecraft.network.play.server.SUpdateLightPacket;
+import net.minecraft.network.play.server.SUpdateRecipesPacket;
+import net.minecraft.network.play.server.SUpdateScorePacket;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.network.play.server.SUpdateTimePacket;
+import net.minecraft.network.play.server.SUpdateViewDistancePacket;
+import net.minecraft.network.play.server.SWindowItemsPacket;
+import net.minecraft.network.play.server.SWindowPropertyPacket;
+import net.minecraft.network.play.server.SWorldBorderPacket;
+import net.minecraft.network.play.server.SWorldSpawnChangedPacket;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -141,115 +167,131 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Represents the {@link PacketDirection#INCOMING} and {@link PacketDirection#OUTGOING}
- * packet types in the game as of version 1.12.2.
+ * packet types in the game as of version 1.16.5.
  */
 @SuppressWarnings({"unchecked", "UnstableApiUsage"})
 public enum PacketType {
-  ABILITIES(CPacketPlayerAbilities.class, SPacketPlayerAbilities.class),
-  ADVANCEMENT_INFO(null, SPacketAdvancementInfo.class),
-  ANIMATION(CPacketAnimation.class, SPacketAnimation.class),
-  BLOCK_ACTION(null, SPacketBlockAction.class),
-  BLOCK_BREAK_ANIMATION(null, SPacketBlockBreakAnim.class),
-  BLOCK_CHANGE(null, SPacketBlockChange.class),
-  CAMERA(null, SPacketCamera.class),
-  CHANGE_GAME_STATE(null, SPacketChangeGameState.class),
-  CHAT(CPacketChatMessage.class, SPacketChat.class),
-  CHUNK_DATA(null, SPacketChunkData.class),
-  CLICK_WINDOW(CPacketClickWindow.class, null),
-  CLIENT_SETTINGS(CPacketClientSettings.class, null),
-  CLIENT_STATUS(CPacketClientStatus.class, null),
-  CLOSE_WINDOW(CPacketCloseWindow.class, SPacketCloseWindow.class),
-  COLLECT_ITEM(null, SPacketCollectItem.class),
-  COMBAT_EVENT(null, SPacketCombatEvent.class),
-  CONFIRM_TELEPORT(CPacketConfirmTeleport.class, null),
-  CONFIRM_TRANSACTION(CPacketConfirmTransaction.class, SPacketConfirmTransaction.class),
-  COOLDOWN(null, SPacketCooldown.class),
-  CREATIVE_INVENTORY_ACTION(CPacketCreativeInventoryAction.class, null),
-  CUSTOM_PAYLOAD(CPacketCustomPayload.class, SPacketCustomPayload.class),
-  CUSTOM_SOUND(null, SPacketCustomSound.class),
-  DESTROY_ENTITIES(null, SPacketDestroyEntities.class),
-  DISCONNECT(null, SPacketDisconnect.class),
-  EFFECT(null, SPacketEffect.class),
-  ENCHANT_ITEM(CPacketEnchantItem.class, null),
-  ENTITY(null, SPacketEntity.class),
-  ENTITY_ACTION(CPacketEntityAction.class, null),
-  ENTITY_ATTACH(null, SPacketEntityAttach.class),
-  ENTITY_EFFECT(null, SPacketEntityEffect.class),
-  ENTITY_EQUIPMENT(null, SPacketEntityEquipment.class),
-  ENTITY_HEAD_LOOK(null, SPacketEntityHeadLook.class),
-  ENTITY_LOOK(null, SPacketEntity.S16PacketEntityLook.class),
-  ENTITY_METADATA(null, SPacketEntityMetadata.class),
-  ENTITY_MOVE_LOOK(null, SPacketEntity.S17PacketEntityLookMove.class),
-  ENTITY_PROPERTIES(null, SPacketEntityProperties.class),
-  ENTITY_STATUS(null, SPacketEntityStatus.class),
-  ENTITY_TELEPORT(null, SPacketEntityTeleport.class),
-  ENTITY_VELOCITY(null, SPacketEntityVelocity.class),
-  EXPLOSION(null, SPacketExplosion.class),
-  HELD_ITEM_CHANGE(CPacketHeldItemChange.class, SPacketHeldItemChange.class),
-  INPUT(CPacketInput.class, null),
-  JOIN_GAME(null, SPacketJoinGame.class),
-  KEEP_ALIVE(CPacketKeepAlive.class, SPacketKeepAlive.class),
-  LOGIN_START(CPacketLoginStart.class, null),
-  LOGIN_SUCCESS(null, SPacketLoginSuccess.class),
-  MAPS(null, SPacketMaps.class),
-  MULTI_BLOCK_CHANGE(null, SPacketMultiBlockChange.class),
-  OPEN_SIGN_EDITOR(null, SPacketSignEditorOpen.class),
-  OPEN_WINDOW(null, SPacketOpenWindow.class),
-  PARTICLES(null, SPacketParticles.class),
-  PLACE_RECIPE(CPacketPlaceRecipe.class, null),
-  PLACE_GHOST_RECIPE(null, SPacketPlaceGhostRecipe.class),
-  PLAYER_DIGGING(CPacketPlayerDigging.class, null),
-  PLAYER_LIST_HEADER_FOOTER(null, SPacketPlayerListHeaderFooter.class),
-  PLAYER_LIST_ITEM(null, SPacketPlayerListItem.class),
-  PLAYER_POSITION(CPacketPlayer.Position.class, null),
-  PLAYER_POSITION_LOOK(null, SPacketPlayerPosLook.class),
-  PLAYER_POSITION_ROTATION(CPacketPlayer.PositionRotation.class, null),
-  PLAYER_ROTATION(CPacketPlayer.Rotation.class, null),
-  RECIPE_BOOK(null, SPacketRecipeBook.class),
-  RECIPE_INFO(CPacketRecipeInfo.class, null),
-  REL_ENTITY_MOVE(null, SPacketEntity.S15PacketEntityRelMove.class),
-  REMOVE_ENTITY_EFFECT(null, SPacketRemoveEntityEffect.class),
-  RESOURCE_PACK_SEND(null, SPacketResourcePackSend.class),
-  RESOURCE_PACK_STATUS(CPacketResourcePackStatus.class, null),
-  RESPAWN(null, SPacketRespawn.class),
-  SCOREBOARD_DISPLAY_OBJECTIVE(null, SPacketDisplayObjective.class),
-  SCOREBOARD_OBJECTIVE(null, SPacketScoreboardObjective.class),
-  SCOREBOARD_SCORE(null, SPacketUpdateScore.class),
-  SEEN_ADVANCEMENTS(CPacketSeenAdvancements.class, null),
-  SELECT_ADVANCEMENTS(null, SPacketSelectAdvancementsTab.class),
-  SERVER_DIFFICULTY(null, SPacketServerDifficulty.class),
-  SET_EXPERIENCE(null, SPacketSetExperience.class),
-  SET_PASSENGERS(null, SPacketSetPassengers.class),
-  SET_SLOT(null, SPacketSetSlot.class),
-  SOUND(null, SPacketSoundEffect.class),
-  SPAWN_EXPERIENCE_ORB(null, SPacketSpawnExperienceOrb.class),
-  SPAWN_GLOBAL_ENTITY(null, SPacketSpawnGlobalEntity.class),
-  SPAWN_MOB(null, SPacketSpawnMob.class),
-  SPAWN_OBJECT(null, SPacketSpawnObject.class),
-  SPAWN_PAINTING(null, SPacketSpawnPainting.class),
-  SPAWN_PLAYER(null, SPacketSpawnPlayer.class),
-  SPAWN_POSITION(null, SPacketSpawnPosition.class),
-  SPECTATE(CPacketSpectate.class, null),
-  STATISTICS(null, SPacketStatistics.class),
-  STEER_BOAT(CPacketSteerBoat.class, null),
-  TAB_COMPLETE(CPacketTabComplete.class, SPacketTabComplete.class),
-  TEAMS(null, SPacketTeams.class),
-  TIME_UPDATE(null, SPacketTimeUpdate.class),
-  TITLE(null, SPacketTitle.class),
-  UNLOAD_CHUNK(null, SPacketUnloadChunk.class),
-  UNSPECIFIED(null, null),
-  UPDATE_BOSS(null, SPacketUpdateBossInfo.class),
-  UPDATE_HEALTH(null, SPacketUpdateHealth.class),
-  UPDATE_SIGN(CPacketUpdateSign.class, null),
-  UPDATE_TILE_ENTITY(null, SPacketUpdateTileEntity.class),
-  USE_BED(null, SPacketUseBed.class),
-  USE_ENTITY(CPacketUseEntity.class, null),
-  USE_ITEM(CPacketPlayerTryUseItem.class, null),
-  USE_ITEM_BLOCK(CPacketPlayerTryUseItemOnBlock.class, null),
-  VEHICLE_MOVE(CPacketVehicleMove.class, SPacketMoveVehicle.class),
-  WINDOW_ITEMS(null, SPacketWindowItems.class),
-  WINDOW_PROPERTY(null, SPacketWindowProperty.class),
-  WORLD_BORDER(null, SPacketWorldBorder.class);
+  ADVANCEMENT_INFO(null, SAdvancementInfoPacket.class),
+  ANIMATE_BLOCK_BREAK(null, SAnimateBlockBreakPacket.class),
+  ANIMATE_HAND(CAnimateHandPacket.class, SAnimateHandPacket.class),
+  BLOCK_ACTION(null, SBlockActionPacket.class),
+  CAMERA(null, SCameraPacket.class),
+  CHANGE_BLOCK(null, SChangeBlockPacket.class),
+  CHANGE_GAME_STATE(null, SChangeGameStatePacket.class),
+  CHAT(CChatMessagePacket.class, SChatPacket.class),
+  CHUNK_DATA(null, SChunkDataPacket.class),
+  CLICK_WINDOW(CClickWindowPacket.class, null),
+  CLIENT_SETTINGS(CClientSettingsPacket.class, null),
+  CLIENT_STATUS(CClientStatusPacket.class, null),
+  CLOSE_WINDOW(CCloseWindowPacket.class, SCloseWindowPacket.class),
+  COLLECT_ITEM(null, SCollectItemPacket.class),
+  COMBAT(null, SCombatPacket.class),
+  COMMAND_LIST(null, SCommandListPacket.class),
+  CONFIRM_TELEPORT(CConfirmTeleportPacket.class, null),
+  CONFIRM_TRANSACTION(CConfirmTransactionPacket.class, SConfirmTransactionPacket.class),
+  COOLDOWN(null, SCooldownPacket.class),
+  CREATIVE_INVENTORY_ACTION(CCreativeInventoryActionPacket.class, null),
+  CUSTOM_PAYLOAD_PLAY(CCustomPayloadPacket.class, SCustomPayloadPlayPacket.class),
+//  CUSTOM_PAYLOAD_LOGIN(CCustomPayloadLoginPacket.class, SCustomPayloadLoginPacket.class),
+  DESTROY_ENTITIES(null, SDestroyEntitiesPacket.class),
+  DISCONNECT(null, SDisconnectPacket.class),
+//  DISCONNECT_LOGIN(null, SDisconnectLoginPacket.class),
+  DISPLAY_OBJECTIVE(null, SDisplayObjectivePacket.class),
+  EDIT_BOOK(CEditBookPacket.class, null),
+  ENCHANT_ITEM(CEnchantItemPacket.class, null),
+  ENTITY_ACTION(CEntityActionPacket.class, null),
+  ENTITY_EQUIPMENT(null, SEntityEquipmentPacket.class),
+  ENTITY_HEAD_LOOK(null, SEntityHeadLookPacket.class),
+  ENTITY_METADATA(null, SEntityMetadataPacket.class),
+  ENTITY(null, SEntityPacket.class),
+  ENTITY_PROPERTIES(null, SEntityPropertiesPacket.class),
+  ENTITY_STATUS(null, SEntityStatusPacket.class),
+  ENTITY_TELEPORT(null, SEntityTeleportPacket.class),
+  ENTITY_VELOCITY(null, SEntityVelocityPacket.class),
+  EXPLOSION(null, SExplosionPacket.class),
+  HELD_ITEM_CHANGE(CHeldItemChangePacket.class, SHeldItemChangePacket.class),
+  INPUT(CInputPacket.class, null),
+  JIGSAW_BLOCK_GENERATE(CJigsawBlockGeneratePacket.class, null),
+  JOIN_GAME(null, SJoinGamePacket.class),
+  KEEP_ALIVE(CKeepAlivePacket.class, SKeepAlivePacket.class),
+  LOCK_DIFFICULTY(CLockDifficultyPacket.class, null),
+  MAP_DATA(null, SMapDataPacket.class),
+  MARK_RECIPE_SEEN(CMarkRecipeSeenPacket.class, null),
+  MERCHANT_OFFERS(null, SMerchantOffersPacket.class),
+  MOUNT_ENTITY(null, SMountEntityPacket.class),
+  MOVE_VEHICLE(CMoveVehiclePacket.class, SMoveVehiclePacket.class),
+  MULTI_BLOCK_CHANGE(null, SMultiBlockChangePacket.class),
+  OPEN_BOOK_WINDOW(null, SOpenBookWindowPacket.class),
+  OPEN_HORSE_WINDOW(null, SOpenHorseWindowPacket.class),
+  OPEN_SIGN_MENU(null, SOpenSignMenuPacket.class),
+  OPEN_WINDOW(null, SOpenWindowPacket.class),
+  PICK_ITEM(CPickItemPacket.class, null),
+  PLACE_RECIPE(CPlaceRecipePacket.class, SPlaceGhostRecipePacket.class),
+  PLAY_ENTITY_EFFECT(null, SPlayEntityEffectPacket.class),
+  PLAYER(CPlayerPacket.class, null),
+  PLAYER_ABILITIES(CPlayerAbilitiesPacket.class, SPlayerAbilitiesPacket.class),
+  PLAYER_DIGGING(CPlayerDiggingPacket.class, SPlayerDiggingPacket.class),
+  PLAYER_LIST_HEADER_FOOTER(null, SPlayerListHeaderFooterPacket.class),
+  PLAYER_LIST_ITEM(null, SPlayerListItemPacket.class),
+  PLAYER_LOOK(null, SPlayerLookPacket.class),
+  PLAYER_POSITION_LOOK(null, SPlayerPositionLookPacket.class),
+  PLAYER_TRY_USE_ITEM(CPlayerTryUseItemPacket.class, null),
+  PLAYER_TRY_USE_ITEM_ON_BLOCK(CPlayerTryUseItemOnBlockPacket.class, null),
+  PLAY_SOUND_EFFECT(null, SPlaySoundEffectPacket.class),
+  PLAY_SOUND_EVENT(null, SPlaySoundEventPacket.class),
+  PLAY_SOUND(null, SPlaySoundPacket.class),
+  QUERY_ENTITY_NBT(CQueryEntityNBTPacket.class, SQueryNBTResponsePacket.class),
+  QUERY_TILE_ENTITY_RESPONSE(CQueryEntityNBTPacket.class, SQueryNBTResponsePacket.class),
+  RECIPE_BOOK(null, SRecipeBookPacket.class),
+  REMOVE_ENTITY_EFFECT(null, SRemoveEntityEffectPacket.class),
+  RENAME_ITEM(CRenameItemPacket.class, null),
+  RESPAWN(null, SRespawnPacket.class),
+  SCOREBOARD_OBJECTIVE(null, SScoreboardObjectivePacket.class),
+  SELECT_ADVANCEMENTS_TAB(null, SSelectAdvancementsTabPacket.class),
+  SELECT_TRADE(CSelectTradePacket.class, null),
+  SEEN_ADVANCEMENTS(CSeenAdvancementsPacket.class, null),
+  SEND_RESOURCE_PACK(CResourcePackStatusPacket.class, SSendResourcePackPacket.class),
+  SERVER_DIFFICULTY(CSetDifficultyPacket.class, SServerDifficultyPacket.class),
+  SET_EXPERIENCE(null, SSetExperiencePacket.class),
+  SET_PASSENGERS(null, SSetPassengersPacket.class),
+  SET_SLOT(null, SSetSlotPacket.class),
+  SPAWN_EXPERIENCE_ORB(null, SSpawnExperienceOrbPacket.class),
+  SPAWN_MOB(null, SSpawnMobPacket.class),
+  SPAWN_MOVING_SOUND_EFFECT(null, SSpawnMovingSoundEffectPacket.class),
+  SPAWN_OBJECT(null, SSpawnObjectPacket.class),
+  SPAWN_PAINTING(null, SSpawnPaintingPacket.class),
+  SPAWN_PARTICLE(null, SSpawnParticlePacket.class),
+  SPAWN_PLAYER(null, SSpawnPlayerPacket.class),
+  SPECTATE(CSpectatePacket.class, null),
+  STATISTICS(null, SStatisticsPacket.class),
+  STEER_BOAT(CSteerBoatPacket.class, null),
+  STOP_SOUND(null, SStopSoundPacket.class),
+  TAB_COMPLETE(CTabCompletePacket.class, STabCompletePacket.class),
+  TAGS_LIST(null, STagsListPacket.class),
+  TEAMS(null, STeamsPacket.class),
+  TITLE(null, STitlePacket.class),
+  UNLOAD_CHUNK(null, SUnloadChunkPacket.class),
+  UPDATE_BEACON(CUpdateBeaconPacket.class, null),
+  UPDATE_CHUNK_POSITION(null, SUpdateChunkPositionPacket.class),
+  UPDATE_COMMAND_BLOCK(CUpdateCommandBlockPacket.class, null),
+  UPDATE_HEALTH(null, SUpdateHealthPacket.class),
+  UPDATE_JIGSAW_BLOCK(CUpdateJigsawBlockPacket.class, null),
+  UPDATE_LIGHT(null, SUpdateLightPacket.class),
+  UPDATE_MINECART_COMMAND_BLOCK(CUpdateMinecartCommandBlockPacket.class, null),
+  UPDATE_RECIPES(CUpdateRecipeBookStatusPacket.class, SUpdateRecipesPacket.class),
+  UPDATE_SIGN(CUpdateSignPacket.class, null),
+  UPDATE_SCORE(null, SUpdateScorePacket.class),
+  UPDATE_STRUCTURE_BLOCK(CUpdateStructureBlockPacket.class, null),
+  UPDATE_TILE_ENTITY(null, SUpdateTileEntityPacket.class),
+  UPDATE_TIME(null, SUpdateTimePacket.class),
+  UPDATE_VIEW_DISTANCE(null, SUpdateViewDistancePacket.class),
+  USE_ENTITY(CUseEntityPacket.class, null),
+  WINDOW_ITEMS(null, SWindowItemsPacket.class),
+  WINDOW_PROPERTY(null, SWindowPropertyPacket.class),
+  WORLD_BORDER(null, SWorldBorderPacket.class),
+  WORLD_SPAWN_CHANGED(null, SWorldSpawnChangedPacket.class),
+
+  UNSPECIFIED(null, null);
 
   private final Class<?> inboundType;
   private final Class<?> outboundType;

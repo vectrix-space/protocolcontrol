@@ -24,11 +24,12 @@
  */
 package com.ichorpowered.protocolcontrol.util;
 
-import com.ichorpowered.indigo.DetailedReport;
 import java.util.function.Consumer;
+
+import net.kyori.indigo.DetailedReport;
 import net.kyori.mu.function.ThrowingRunnable;
+import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.slf4j.Logger;
 
 public final class Exceptions {
   /**
@@ -144,6 +145,6 @@ public final class Exceptions {
    * @param report The report
    */
   public static void printReport(final @NonNull Logger logger, final @NonNull DetailedReport report) {
-    logger.error(String.format("%s:\n %s", report.message(), report.toString()));
+    logger.error(String.format("%s:\n %s", report.message(), report));
   }
 }

@@ -26,25 +26,25 @@ package com.ichorpowered.protocolcontrol.packet.translator.type;
 
 import com.google.common.reflect.TypeToken;
 import com.ichorpowered.protocolcontrol.packet.translator.Translator;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.minecraft.util.text.ITextComponent;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.common.text.SpongeTexts;
 
 @SuppressWarnings({"unchecked", "UnstableApiUsage"})
-public final class ComponentTextTranslator implements Translator<Text> {
+public final class ComponentTextTranslator implements Translator<Component> {
   @Override
-  public @Nullable Text wrap(final @Nullable Object object) {
+  public @Nullable Component wrap(final @Nullable Object object) {
     if(object == null) return null;
     final ITextComponent message = (ITextComponent) object;
-    return SpongeTexts.toText(message);
+    return GsonComponentSerializer.gson().deserialize(ITextComponent.Serializer.toJson(message));
   }
 
   @Override
-  public <E> @Nullable E unwrap(final @Nullable Text translation) {
+  public <E> @Nullable E unwrap(final @Nullable Component translation) {
     if(translation == null) return null;
-    final ITextComponent message = SpongeTexts.toComponent(translation);
+    final ITextComponent message = ITextComponent.Serializer.fromJson(GsonComponentSerializer.gson().serializeToTree(translation));
     return (E) message;
   }
 
