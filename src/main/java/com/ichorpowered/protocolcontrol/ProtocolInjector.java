@@ -33,7 +33,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import net.minecraft.network.NetworkSystem;
 import net.minecraft.server.MinecraftServer;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.Logger;
 import org.spongepowered.api.Game;
 
 @Singleton
@@ -58,14 +58,16 @@ public final class ProtocolInjector {
   }
 
   @SuppressWarnings({"unchecked", "JavaReflectionMemberAccess"})
-  protected void setup() {
+  void setup() {
     if(this.setup) return;
 
     Exceptions.catchingReport(
       () -> {
         final Field networkField = MinecraftServer.class.getDeclaredField("field_147144_o");
-        final NetworkSystem networkSystem = (NetworkSystem) networkField.get(this.game.getServer());
+        networkField.setAccessible(true);
+        final NetworkSystem networkSystem = (NetworkSystem) networkField.get(this.game.server());
         final Field endpointsField = networkSystem.getClass().getDeclaredField("field_151274_e");
+        endpointsField.setAccessible(true);
         this.endpoints = (List<ChannelFuture>) endpointsField.get(networkSystem);
         this.setup = true;
       },
@@ -76,7 +78,7 @@ public final class ProtocolInjector {
     );
   }
 
-  protected void enable() {
+  void enable() {
     if(this.enabled || !this.setup) return;
     Exceptions.catchingReport(
       () -> {
@@ -92,7 +94,7 @@ public final class ProtocolInjector {
     );
   }
 
-  protected void disable() {
+  void disable() {
     if(!this.enabled) return;
     Exceptions.catchingReport(
       () -> {

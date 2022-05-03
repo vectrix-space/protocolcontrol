@@ -38,10 +38,11 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import java.util.UUID;
-import net.minecraft.network.Packet;
-import net.minecraft.network.login.server.SPacketLoginSuccess;
+
+import net.minecraft.network.IPacket;
+import net.minecraft.network.login.server.SLoginSuccessPacket;
+import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.slf4j.Logger;
 
 import static java.util.Objects.requireNonNull;
 
@@ -88,7 +89,7 @@ public final class PacketHandler extends ChannelDuplexHandler {
           context.pipeline().remove(this).addBefore("packet_handler", ProtocolInjector.CHANNEL_HANDLER, this);
           context.pipeline().addAfter("decoder", ProtocolInjector.INCOMING_HANDLER, incoming);
           context.pipeline().addAfter("packet_handler", ProtocolInjector.OUTGOING_HANDLER, outgoing);
-          this.remapper.structure(SPacketLoginSuccess.class); // Prepare the structure early.
+          this.remapper.structure(SLoginSuccessPacket.class); // Prepare the structure early.
           this.profile.active(true);
           this.injected = true;
         }
@@ -108,7 +109,7 @@ public final class PacketHandler extends ChannelDuplexHandler {
   public void write(final ChannelHandlerContext context, final Object message, final ChannelPromise promise) throws Exception {
     Exceptions.catchingReport(
       () -> {
-        if(message instanceof SPacketLoginSuccess) {
+        if(message instanceof SLoginSuccessPacket) {
           final PacketRemapper.Wrapped wrapped = this.remapper.wrap(message);
           final GameProfile profile = wrapped.getRaw(GameProfile.class, 0);
           if(profile != null) {
@@ -168,7 +169,7 @@ public final class PacketHandler extends ChannelDuplexHandler {
     public void channelRead(final ChannelHandlerContext context, final Object message) throws Exception {
       Object transformedMessage = message;
       try {
-        if(transformedMessage instanceof Packet && this.event.hasSubscribers()) {
+        if(transformedMessage instanceof IPacket && this.event.hasSubscribers()) {
           final PacketEvent packetEvent = new PacketEvent(this.profile, PacketDirection.INCOMING, transformedMessage);
           this.event.fire(packetEvent).get();
           if(packetEvent.cancelled()) return;
@@ -207,7 +208,7 @@ public final class PacketHandler extends ChannelDuplexHandler {
     public void write(final ChannelHandlerContext context, final Object message, final ChannelPromise promise) throws Exception {
       Object transformedMessage = message;
       try {
-        if(transformedMessage instanceof Packet && this.event.hasSubscribers()) {
+        if(transformedMessage instanceof IPacket && this.event.hasSubscribers()) {
           final PacketEvent packetEvent = new PacketEvent(this.profile, PacketDirection.OUTGOING, transformedMessage);
           this.event.fire(packetEvent).get();
           if(packetEvent.cancelled()) return;

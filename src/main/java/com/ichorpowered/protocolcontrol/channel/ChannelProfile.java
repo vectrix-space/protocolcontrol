@@ -38,12 +38,12 @@ import java.util.function.Consumer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 public final class ChannelProfile {
   private final Channel channel;
   private @Nullable UUID id;
-  private WeakReference<Player> player;
+  private WeakReference<ServerPlayer> player;
   private boolean active = false;
 
   @Inject
@@ -74,7 +74,7 @@ public final class ChannelProfile {
    *
    * @return the player, if present
    */
-  public @NonNull Optional<Player> player() {
+  public @NonNull Optional<ServerPlayer> player() {
     if(this.id == null) return Optional.empty();
     if(this.player != null) return Optional.ofNullable(this.player.get());
     return this.player(this.id);
@@ -162,9 +162,9 @@ public final class ChannelProfile {
     }
   }
 
-  private @NonNull Optional<Player> player(final @NonNull UUID id) {
+  private @NonNull Optional<ServerPlayer> player(final @NonNull UUID id) {
     if(!Sponge.isServerAvailable()) return Optional.empty();
-    final Optional<Player> optionalPlayer = Sponge.getServer().getPlayer(id);
+    final Optional<ServerPlayer> optionalPlayer = Sponge.server().player(id);
     optionalPlayer.ifPresent(value -> this.player = new WeakReference<>(value));
     return optionalPlayer;
   }

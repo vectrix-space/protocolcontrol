@@ -24,7 +24,6 @@
  */
 package com.ichorpowered.protocolcontrol.packet;
 
-import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
@@ -41,27 +40,28 @@ import com.ichorpowered.protocolcontrol.packet.translator.type.Vector3iTranslato
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+
+import net.kyori.adventure.audience.MessageType;
+import net.kyori.adventure.bossbar.BossBar;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.advancement.Advancement;
 import org.spongepowered.api.advancement.AdvancementProgress;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.boss.BossBarColor;
-import org.spongepowered.api.boss.BossBarOverlay;
 import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.effect.potion.PotionEffectType;
-import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.api.entity.living.player.chat.ChatVisibility;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.profile.GameProfile;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.chat.ChatType;
-import org.spongepowered.api.text.chat.ChatVisibility;
-import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.difficulty.Difficulty;
+import org.spongepowered.math.vector.Vector3i;
 
 @Singleton
 @SuppressWarnings("UnstableApiUsage")
@@ -75,28 +75,28 @@ public final class PacketTranslations {
 
   public void register() {
     this.translation.translate(TypeToken.of(AdvancementProgress.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.advancements.AdvancementProgress.class)));
-    this.translation.translate(TypeToken.of(BlockState.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.block.state.IBlockState.class)));
+    this.translation.translate(TypeToken.of(BlockState.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.block.BlockState.class)));
     this.translation.translate(TypeToken.of(BlockType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.block.Block.class)));
-    this.translation.translate(TypeToken.of(BossBarColor.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.world.BossInfo.Color.class)));
-    this.translation.translate(TypeToken.of(BossBarOverlay.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.world.BossInfo.Overlay.class)));
-    this.translation.translate(TypeToken.of(ChatType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.util.text.ChatType.class)));
-    this.translation.translate(TypeToken.of(ChatVisibility.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.entity.player.EntityPlayer.EnumChatVisibility.class)));
-    this.translation.translate(TypeToken.of(Difficulty.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.world.EnumDifficulty.class)));
-    this.translation.translate(TypeToken.of(EquipmentType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.inventory.EntityEquipmentSlot.class)));
+    this.translation.translate(TypeToken.of(BossBar.Color.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.world.BossInfo.Color.class)));
+    this.translation.translate(TypeToken.of(BossBar.Overlay.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.world.BossInfo.Overlay.class)));
+    this.translation.translate(TypeToken.of(MessageType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.util.text.ChatType.class)));
+    this.translation.translate(TypeToken.of(ChatVisibility.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.entity.player.ChatVisibility.class)));
+    this.translation.translate(TypeToken.of(Difficulty.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.world.Difficulty.class)));
+    this.translation.translate(TypeToken.of(EquipmentType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.inventory.EquipmentSlotType.class)));
     this.translation.translate(TypeToken.of(GameMode.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.world.GameType.class)));
     this.translation.translate(TypeToken.of(GameProfile.class), new DelegateTranslator<>(TypeToken.of(com.mojang.authlib.GameProfile.class)));
-    this.translation.translate(TypeToken.of(GeneratorType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.world.WorldType.class)));
-    this.translation.translate(TypeToken.of(HandPreference.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.util.EnumHandSide.class)));
-    this.translation.translate(TypeToken.of(HandType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.util.EnumHand.class)));
+//    this.translation.translate(TypeToken.of(World.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.world.WorldType.class)));
+    this.translation.translate(TypeToken.of(HandPreference.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.util.HandSide.class)));
+    this.translation.translate(TypeToken.of(HandType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.util.Hand.class)));
     this.translation.translate(TypeToken.of(ItemStack.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.item.ItemStack.class)));
-    this.translation.translate(TypeToken.of(ParticleType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.util.EnumParticleTypes.class)));
+    this.translation.translate(TypeToken.of(ParticleType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.particles.ParticleTypes.class)));
     this.translation.translate(TypeToken.of(PotionEffectType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.potion.Potion.class)));
-    this.translation.translate(TypeToken.of(SoundCategory.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.util.SoundCategory.class)));
+    this.translation.translate(TypeToken.of(Sound.Source.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.util.SoundCategory.class)));
     this.translation.translate(TypeToken.of(SoundType.class), new DelegateTranslator<>(TypeToken.of(net.minecraft.util.SoundEvent.class)));
 
     this.translation.translate(new TypeToken<Collection<Advancement>>() {}, new AdvancementAdditionsTranslator());
     this.translation.translate(TypeToken.of(ResourceKey.class), new ResourceKeyTranslator());
-    this.translation.translate(TypeToken.of(Text.class), new ComponentTextTranslator());
+    this.translation.translate(TypeToken.of(Component.class), new ComponentTextTranslator());
     this.translation.translate(TypeToken.of(Vector3i.class), new Vector3iTranslator());
 
     this.translation.translate(new TypeToken<Set<ResourceKey>>() {}, new ForwardingCollectionTranslator<>(

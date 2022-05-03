@@ -35,9 +35,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+
+import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.slf4j.Logger;
 
 import static java.util.Objects.requireNonNull;
 
@@ -48,8 +49,8 @@ import static java.util.Objects.requireNonNull;
  */
 @SuppressWarnings("UnstableApiUsage")
 public final class PacketStructure {
-  protected static @NonNull PacketStructure generate(final @NonNull Logger logger, final MethodHandles.@NonNull Lookup lookup,
-                                                     final @NonNull Class<?> packet) {
+  static @NonNull PacketStructure generate(final @NonNull Logger logger, final MethodHandles.@NonNull Lookup lookup,
+                                           final @NonNull Class<?> packet) {
     final Map<TypeToken<?>, List<Handle>> handleMap = Maps.newHashMap();
     PacketStructure.find(packet, Class::getSuperclass, fields -> {
       for(final Field field : fields) {
@@ -74,8 +75,8 @@ public final class PacketStructure {
     return new PacketStructure(packet, handleMap);
   }
 
-  protected static void find(final @NonNull Class<?> search, final @NonNull Function<Class<?>, Class<?>> superSearch,
-                             final @NonNull Consumer<Field[]> fieldSearch) {
+  private static void find(final @NonNull Class<?> search, final @NonNull Function<Class<?>, Class<?>> superSearch,
+                           final @NonNull Consumer<Field[]> fieldSearch) {
     Class<?> searchClass = search;
     while(searchClass != null) {
       final Field[] fields = searchClass.getDeclaredFields();

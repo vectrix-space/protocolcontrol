@@ -42,12 +42,12 @@ public final class ProtocolChannel {
   private final ConcurrentMap<UUID, ChannelProfile> channels = Maps.newConcurrentMap();
   private boolean enabled = false;
 
-  protected void enable() {
+  void enable() {
     if(this.enabled) return;
     this.enabled = true;
   }
 
-  protected void disable() {
+  void disable() {
     if(!this.enabled) return;
     this.enabled = false;
     this.channels.clear();

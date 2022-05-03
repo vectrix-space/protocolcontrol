@@ -55,7 +55,7 @@ public final class AdvancementAdditionsTranslator implements Translator<Collecti
     final Map<ResourceLocation, net.minecraft.advancements.Advancement.Builder> advancementMap = Maps.newHashMap();
     for(final Advancement advancement : translation) {
       final net.minecraft.advancements.Advancement element = (net.minecraft.advancements.Advancement) advancement;
-      advancementMap.put(element.getId(), element.copy());
+      advancementMap.put(element.getId(), element.deconstruct());
     }
     return (E) advancementMap;
   }

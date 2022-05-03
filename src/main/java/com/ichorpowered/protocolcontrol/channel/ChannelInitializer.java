@@ -34,7 +34,7 @@ import com.ichorpowered.protocolcontrol.util.Exceptions;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.Logger;
 
 @Singleton
 public final class ChannelInitializer extends ChannelInboundHandlerAdapter {

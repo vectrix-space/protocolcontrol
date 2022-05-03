@@ -32,9 +32,10 @@ import com.ichorpowered.protocolcontrol.packet.translator.Translator;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
+
+import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.slf4j.Logger;
 
 import static java.util.Objects.requireNonNull;
 

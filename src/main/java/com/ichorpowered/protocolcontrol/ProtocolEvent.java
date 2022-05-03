@@ -45,8 +45,8 @@ import net.kyori.event.PostResult;
 import net.kyori.event.SimpleEventBus;
 import net.kyori.event.method.MethodSubscriptionAdapter;
 import net.kyori.event.method.asm.ASMEventExecutorFactory;
+import org.apache.logging.log4j.Logger;
 import org.checkerframework.checker.nullness.qual.NonNull;
-import org.slf4j.Logger;
 
 import static java.util.Objects.requireNonNull;
 
@@ -66,7 +66,7 @@ public final class ProtocolEvent {
     this.logger = logger;
   }
 
-  protected void enable() {
+  void enable() {
     if(this.enabled) return;
     this.bus = new SimpleEventBus<Object>(Object.class) {
       @Override
@@ -92,7 +92,7 @@ public final class ProtocolEvent {
     this.enabled = true;
   }
 
-  protected void disable() {
+  void disable() {
     if(!this.enabled) return;
     this.bus.unregisterAll();
     this.service.shutdownNow();

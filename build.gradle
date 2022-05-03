@@ -1,40 +1,86 @@
+import org.spongepowered.gradle.plugin.config.PluginLoaders
+import org.spongepowered.plugin.metadata.model.PluginDependency
+
 buildscript {
   repositories {
+    mavenCentral()
     maven {
       name = "forge"
-      url = "http://files.minecraftforge.net/maven"
+      url = "https://files.minecraftforge.net/maven"
     }
   }
-
   dependencies {
-    classpath "net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT"
+    classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
   }
 }
 
 plugins {
-  id "java"
+  id 'java'
+  id 'java-library'
   id "maven-publish"
-  id "net.minecrell.licenser" version "0.4.1"
-  id "com.github.johnrengelman.shadow" version "5.2.0"
-  id "net.minecrell.vanillagradle.server" version "2.2-6"
-  id "org.spongepowered.plugin" version "0.9.0"
+  id 'org.cadixdev.licenser' version '0.6.1'
+  id 'com.github.johnrengelman.shadow' version '7.1.2'
+  id "org.spongepowered.gradle.plugin" version "2.0.1"
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+
+minecraft {
+  // The mappings can be changed at any time, and must be in the following format.
+  // snapshot_YYYYMMDD   Snapshot are built nightly.
+  // stable_#            Stables are built at the discretion of the MCP team.
+  // Use non-default mappings at your own risk. they may not always work.
+  // Simply re-run your setup task after changing the mappings to update your workspace.
+  mappings channel: 'official', version: '1.16.5'
 }
 
 group = "com.ichorpowered"
 version = "0.1.0-SNAPSHOT"
 description = "A minimal packet manipulation library for Sponge."
 
-sponge.plugin.id = project.name
-
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
 
+sponge {
+  apiVersion("8.0.0")
+  license("MIT")
+  loader {
+    name(PluginLoaders.JAVA_PLAIN)
+    version("1.0")
+  }
+  plugin("protocolcontrol") {
+    displayName("Protocol Control")
+    entrypoint("com.ichorpowered.protocolcontrol.ProtocolPlugin")
+    description("${project.description}")
+    links {
+      source("https://github.com/vectrix-space/protocolcontrol")
+      issues("https://github.com/vectrix-space/protocolcontrol/issues")
+    }
+    contributor("Vectrix") {
+      description("Project Owner/Developer")
+    }
+    dependency("spongeapi") {
+      loadOrder(PluginDependency.LoadOrder.AFTER)
+      optional(false)
+    }
+  }
+}
+
 repositories {
+  mavenCentral()
   maven {
     url "https://oss.sonatype.org/content/repositories/snapshots"
   }
+//  maven {
+//    url "https://repo.ichorpowered.com/repository/maven-public"
+//  }
   maven {
-    url "https://repo.ichorpowered.com/repository/maven-public"
+    name 'Sponge Releases'
+    url 'https://repo.spongepowered.org/repository/maven-releases'
+  }
+  maven {
+    name 'Sponge Snapshots'
+    url 'https://repo.spongepowered.org/repository/maven-snapshots'
   }
 }
 
@@ -51,25 +97,21 @@ license {
 }
 
 dependencies {
-  compile "com.ichorpowered:indigo:1.0.0-SNAPSHOT"
-  compile "net.kyori:mu:1.0.0-SNAPSHOT"
-  compile "net.kyori:violet:1.2.0-SNAPSHOT"
-  compile "net.kyori:event-method-asm:4.0.0-SNAPSHOT"
-  compileOnly "org.spongepowered:spongeapi:7.3.0"
-  compileOnly "org.spongepowered:spongecommon:1.12.2-7.3.0:dev"
-  annotationProcessor "org.spongepowered:spongeapi:7.3.0"
+  minecraft 'net.minecraftforge:forge:1.16.5-36.2.20'
+
+  implementation "net.kyori:indigo:1.0.0-SNAPSHOT"
+  implementation "net.kyori:mu:1.0.0-SNAPSHOT"
+  implementation "net.kyori:violet:1.2.0-SNAPSHOT"
+  implementation "net.kyori:event-method-asm:4.0.0-SNAPSHOT"
+  implementation 'com.google.inject:guice:4.1.0'
+  compileOnly group: 'org.spongepowered', name: 'math', version: '2.0.1'
+  //compileOnly "org.spongepowered:sponge:1.16.5-8.0.0-SNAPSHOT:dev"
 }
 
 tasks.withType(JavaCompile) {
   options.compilerArgs += ["-Xlint:all", "-Xlint:-path", "-parameters"]
   options.deprecation = true
   options.encoding = "UTF-8"
-}
-
-minecraft {
-  version = "1.12.2"
-  mappings = "snapshot_20180808"
-  makeObfSourceJar = false
 }
 
 jar {
@@ -110,26 +152,33 @@ task javadocsJar(type: Jar) {
 
 shadowJar {
   classifier = "shaded"
-  dependsOn reobfJar
 
   dependencies {
-    include(dependency("com.ichorpowered:indigo"))
+    include(dependency("net.kyori:indigo"))
 
     include(dependency("net.kyori:mu"))
     include(dependency("net.kyori:violet"))
     include(dependency("net.kyori:event-api"))
     include(dependency("net.kyori:event-method"))
     include(dependency("net.kyori:event-method-asm"))
-    include(dependency("net.kyori:examination-api"))
+    //include(dependency("net.kyori:examination-api"))
 
+    include(dependency("com.google.inject:guice"))
     include(dependency("com.google.inject.extensions:guice-assistedinject"))
     include(dependency("com.google.inject.extensions:guice-multibindings"))
   }
 
-  relocate("com.ichorpowered.indigo", "com.ichorpowered.indigo.lib.indigo")
-  relocate("net.kyori", "com.ichorpowered.protocolcontrol.lib.kyori")
-
+  relocate('com.google.guice', 'com.ichorpowered.protocolcontrol.lib.guice')
+  relocate("net.kyori.mu", "com.ichorpowered.protocolcontrol.lib.kyori.mu")
+  relocate("net.kyori.violet", "com.ichorpowered.protocolcontrol.lib.kyori.violet")
+  relocate("net.kyori.event-api", "com.ichorpowered.protocolcontrol.lib.kyori.event-api")
+  relocate("net.kyori.event-method", "com.ichorpowered.protocolcontrol.lib.kyori.event-method")
+  relocate("net.kyori.event-method-asm", "com.ichorpowered.protocolcontrol.lib.kyori.event-method-asm")
   exclude "dummyThing"
+}
+
+reobf {
+  shadowJar {}
 }
 
 def ichorpoweredUsername = System.getenv("ICHORPOWERED_USERNAME")
@@ -191,3 +240,6 @@ publishing {
     }
   }
 }
+
+checkLicenseMain.dependsOn(updateLicenses)
+build.dependsOn reobfShadowJar
